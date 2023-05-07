@@ -7,11 +7,14 @@ using UnityEngine;
 
 namespace ModInstaller
 {
-	public class Requests 
+	public static class Requests 
 	{
+        private static readonly string modFolderPath = ModInstaller.Main.inst.ModFolder;
+        
         private static async Task<string> GetAsync(string endpoint)
         {
             var url = $"https://api.astromods.xyz{endpoint}";
+            Debug.Log(url);
             using var client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(url);
             
@@ -21,26 +24,22 @@ namespace ModInstaller
             string content = await response.Content.ReadAsStringAsync();
             return content;
         }
-
-
         private static async Task Main(string[] args)
         {
         string content = await GetAsync("/mods?limit=5");
         Console.WriteLine(content); 
         }
         
-
         public static void DownloadFile(string url, string destinationFilePath)
         {
             using var client = new WebClient();
             client.DownloadFile(url, destinationFilePath);
         }
+        
         public static void DeleteFolder(string folderPath)
         {
             Directory.Delete(folderPath, true);
         }
-        
-        private readonly string modFolderPath = ModInstaller.Main.main.ModFolder;
 
         public static async Task CheckHealth()
         {
@@ -54,8 +53,6 @@ namespace ModInstaller
             string content = await GetAsync($"/total/mods?tags={tags}&q={query}");
             Debug.Log(content);
         }
-
-
         public static async Task ListMods(int limit, int offset)
         {
             var endpoint = $"/mods?limit={limit}&offset={offset}";
@@ -113,9 +110,5 @@ namespace ModInstaller
             // Do something with the content, e.g. parse the JSON
             Debug.Log(content);
         }
-
-
-
-
     }
 }
