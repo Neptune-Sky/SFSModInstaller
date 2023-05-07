@@ -21,6 +21,8 @@ namespace ModInstaller
 
         // This initializes the patcher. This is required if you use any Harmony patches.
         private static Harmony patcher;
+
+        public static Main main;
         
         private void insertModsButton()
         {
@@ -39,8 +41,7 @@ namespace ModInstaller
             });
 
             // screen position
-            var transform = buttonPC.transform;
-            transform.localScale = new Vector3(1,1,1);
+            buttonPC.transform.localScale = new Vector3(1,1,1);
         }
         public override void Load()
         {
@@ -48,6 +49,7 @@ namespace ModInstaller
 
         public override void Early_Load()
         {
+            main = this;
             SceneHelper.OnHomeSceneLoaded += insertModsButton;
             patcher = new Harmony(ModNameID);
             patcher.PatchAll();
