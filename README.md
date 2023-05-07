@@ -1,2 +1,2 @@
 # SFSModInstaller
-Frontend for 0xN's Mod Installer API
+Frontend for 0xNim's Mod Installer API
