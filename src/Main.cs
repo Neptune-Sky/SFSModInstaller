@@ -22,14 +22,14 @@ namespace ModInstaller
         // This initializes the patcher. This is required if you use any Harmony patches.
         private static Harmony patcher;
 
-        public static Main main;
+        public static Main inst;
         
-        private void insertModsButton()
+        private static void insertModsButton()
         {
             Transform buttons = GameObject.Find("Buttons").transform;
             GameObject modsButton = Object.Instantiate(GameObject.Find("Exit Button"), buttons, true);
-            ButtonPC buttonPC = modsButton.GetComponent<ButtonPC>();
-            TextAdapter textAdapter = modsButton.GetComponentInChildren<TextAdapter>();
+            var buttonPC = modsButton.GetComponent<ButtonPC>();
+            var textAdapter = modsButton.GetComponentInChildren<TextAdapter>();
             Object.Destroy(modsButton.GetComponent<TranslationSelector>());
             modsButton.name = "Mod Installer Button";
             textAdapter.Text = "Mod Installer";// add text button
@@ -45,11 +45,16 @@ namespace ModInstaller
         }
         public override void Load()
         {
+            LoadAsync();
         }
 
+        private static async void LoadAsync()
+        {
+            await Requests.ListMods(20, 0);
+        }
         public override void Early_Load()
         {
-            main = this;
+            inst = this;
             SceneHelper.OnHomeSceneLoaded += insertModsButton;
             patcher = new Harmony(ModNameID);
             patcher.PatchAll();
