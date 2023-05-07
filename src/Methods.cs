@@ -42,6 +42,19 @@ namespace ModInstaller
         
         private readonly string modFolderPath = ModInstaller.Main.main.ModFolder;
 
+        public static async Task CheckHealth()
+        {
+            string content = await GetAsync("/health");
+            Debug.Log(content);
+        }
+
+        public static async Task GetModCount(string tags, string query)
+        {
+            // Currently takes input with tags already seperated by commas
+            string content = await GetAsync($"/total/mods?tags={tags}&q={query}");
+            Debug.Log(content);
+        }
+
 
         public static async Task ListMods(int limit, int offset)
         {
@@ -51,6 +64,56 @@ namespace ModInstaller
             // Do something with the content, e.g. parse the JSON
             Debug.Log(content);
         }
+
+        public static async Task GetMod(string modId)
+        {
+            // The mod ID is the ID of the mod not a number, e.g. "VanUp","UITools","SFS_ESM_UTILITY"
+            var endpoint = $"/mods/{modId}";
+            string content = await GetAsync(endpoint);
+
+            // Do something with the content, e.g. parse the JSON
+            Debug.Log(content);
+        }
+
+        public static async Task GetModVersions(string modId, string version)
+        {
+            // The mod ID is the ID of the mod not a number, e.g. "VanUp","UITools","SFS_ESM_UTILITY"
+            var endpoint = $"/mods/{modId}/versions/";
+            string content = await GetAsync(endpoint);
+
+            // Do something with the content, e.g. parse the JSON
+            Debug.Log(content);
+        }
+
+        public static async Task GetModVersion(string modId, string version)
+        {
+            // The mod ID is the ID of the mod not a number, e.g. "VanUp","UITools","SFS_ESM_UTILITY"
+            // Version number: e.g. "1.0.0"
+            var endpoint = $"/mods/{modId}/versions/{version}";
+            string content = await GetAsync(endpoint);
+
+            // Do something with the content, e.g. parse the JSON
+            Debug.Log(content);
+        }
+
+        public static async Task SearchMods(string query, int limit, int offset)
+        {
+            var endpoint = $"/search/{query}?limit={limit}&offset={offset}";
+            string content = await GetAsync(endpoint);
+
+            // Do something with the content, e.g. parse the JSON
+            Debug.Log(content);
+        }
+
+        public static async Task SearchTags(string query, int limit, int offset)
+        {
+            var endpoint = $"/tags/{query}?limit={limit}&offset={offset}";
+            string content = await GetAsync(endpoint);
+
+            // Do something with the content, e.g. parse the JSON
+            Debug.Log(content);
+        }
+
 
 
 
