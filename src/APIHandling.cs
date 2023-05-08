@@ -145,5 +145,16 @@ namespace ModInstaller
             // Do something with the content, e.g. parse the JSON
             Debug.Log(content);
         }
+
+        public static async Task VersionNumberToVersionID(string modID, string versionNumber = "latest")
+        {
+            // Convert modID and versionNumber to versionID
+            // By requesting /all/:modID/:versionNumber
+            var endpoint = $"/all/{modID}/{versionNumber}";
+            string content = await GetAsync(endpoint);
+
+            // Do something with the content, e.g. parse the JSON
+            Debug.Log(content);
+        }
     }
 }
