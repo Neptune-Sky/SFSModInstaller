@@ -24,11 +24,19 @@ namespace ModInstaller
 	{
         private static readonly string modFolderPath = ModInstaller.Main.inst.ModFolder;
 
-        public static ModData[] results;
+        public static ModData[] results = {};
 
-        static void SaveResults(string json)
+        private static void SaveResults(string json)
         {
-            results = JsonConvert.DeserializeObject<ModData[]>(json);
+            try
+            {
+                results = JsonConvert.DeserializeObject<ModData[]>(json);
+            }
+            catch (Exception)
+            {
+                results = null;
+                throw;
+            }
         }
         
         private static async Task<string> GetAsync(string endpoint)

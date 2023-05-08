@@ -52,13 +52,14 @@ namespace ModInstaller
             //click events
             buttonPC.holdEvent = new HoldUnityEvent();
             buttonPC.clickEvent = new ClickUnityEvent();
-            buttonPC.clickEvent.AddListener(delegate (OnInputEndData data) {
+            buttonPC.clickEvent.AddListener(delegate
+            {
                 SoundPlayer.main.clickSound.Play();
                 InstallerMenu.main.Open();
             });
 
             // screen position
-            buttonPC.transform.localScale = new Vector3(1,1,1);
+            // buttonPC.transform.localScale = new Vector3(1,1,1);
         }
     }
 }
