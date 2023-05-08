@@ -3,13 +3,33 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace ModInstaller
 {
+    [Serializable]
+    public class ModData
+    {
+        public string modID;
+        public string modName;
+        public string modDescription;
+        public string modAuthor;
+        public string modVersion;
+        public string modReleaseDate;
+        public string modTags;
+        public string modIcon;
+    }
 	public static class Requests 
 	{
         private static readonly string modFolderPath = ModInstaller.Main.inst.ModFolder;
+
+        public static ModData[] results;
+
+        static void SaveResults(string json)
+        {
+            results = JsonConvert.DeserializeObject<ModData[]>(json);
+        }
         
         private static async Task<string> GetAsync(string endpoint)
         {
@@ -61,7 +81,14 @@ namespace ModInstaller
             // Do something with the content, e.g. parse the JSON
             Debug.Log(content);
         }
+        public static async Task PullMods(int limit, int offset)
+        {
+            var endpoint = $"/mods?limit={limit}&offset={offset}";
+            string content = await GetAsync(endpoint);
 
+            // Do something with the content, e.g. parse the JSON
+            SaveResults(content);
+        }
         public static async Task GetMod(string modId)
         {
             // The mod ID is the ID of the mod not a number, e.g. "VanUp","UITools","SFS_ESM_UTILITY"

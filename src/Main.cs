@@ -1,7 +1,6 @@
 using HarmonyLib;
 using ModLoader;
 using ModLoader.Helpers;
-using ModLoader.UI;
 using SFS.Audio;
 using SFS.Input;
 using SFS.Translations;
@@ -29,12 +28,6 @@ namespace ModInstaller
         
         public override void Load()
         {
-            // LoadAsync();
-        }
-
-        private static async void LoadAsync()
-        {
-            await Requests.ListMods(20, 0);
         }
         public override void Early_Load()
         {
