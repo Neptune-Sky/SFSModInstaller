@@ -158,7 +158,7 @@ namespace ModInstaller
         }
         
 
-        public static ModVersionData versionResults = { };
+        public static ModVersionData versionResults;
         
         public static async Task VersionNumberToVersionID(string modID, string versionNumber = "latest")
         {
