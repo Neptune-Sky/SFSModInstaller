@@ -56,6 +56,7 @@ namespace ModInstaller
             {
                 SoundPlayer.main.clickSound.Play();
                 InstallerMenu.main.Open();
+                Requests.VersionNumberToVersionID("UITools");
             });
 
             // screen position

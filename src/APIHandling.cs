@@ -20,7 +20,18 @@ namespace ModInstaller
         public string modTags;
         public string modIcon;
     }
-	public static class Requests 
+
+    [Serializable]
+    public class ModVersionData
+    {
+        public int modVersionID;
+        public string modID;
+        public string versionNumber;
+        public string releaseDate;
+        public string changelog;
+    }
+
+    public static class Requests 
 	{
         private static readonly string modFolderPath = ModInstaller.Main.inst.ModFolder;
 
@@ -145,16 +156,32 @@ namespace ModInstaller
             // Do something with the content, e.g. parse the JSON
             Debug.Log(content);
         }
+        
 
+        public static ModVersionData versionResults = { };
+        
         public static async Task VersionNumberToVersionID(string modID, string versionNumber = "latest")
         {
+            Debug.Log("check1");
             // Convert modID and versionNumber to versionID
             // By requesting /all/:modID/:versionNumber
-            var endpoint = $"/all/{modID}/{versionNumber}";
-            string content = await GetAsync(endpoint);
+            var endpoint = $"/version/alternative/{modID}/{versionNumber}";
+            string json = await GetAsync(endpoint);
 
-            // Do something with the content, e.g. parse the JSON
-            Debug.Log(content);
+            try
+            {
+                Debug.Log("check2");
+                versionResults = JsonConvert.DeserializeObject<ModVersionData>(json);
+                Debug.Log("check3");
+            }
+            catch (Exception)
+            {
+                versionResults = null;
+                throw;
+            }
+            Debug.Log("check4");
+            Debug.Log(versionResults);
+            
         }
     }
 }
