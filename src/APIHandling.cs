@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ModLoader.UI;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -35,13 +38,13 @@ namespace ModInstaller
 	{
         private static readonly string modFolderPath = ModInstaller.Main.inst.ModFolder;
 
-        public static ModData[] results = {};
+        public static List<ModData> results = new();
 
         private static void SaveResults(string json)
         {
             try
             {
-                results = JsonConvert.DeserializeObject<ModData[]>(json);
+                results = JsonConvert.DeserializeObject<ModData[]>(json).ToList();
             }
             catch (Exception)
             {

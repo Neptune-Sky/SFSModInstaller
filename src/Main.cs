@@ -14,7 +14,7 @@ namespace ModInstaller
 
         public override string ModNameID => "0xNim.ModInstaller.Mod";
         public override string DisplayName => "Mod Installer";
-        public override string Author => "0xNim";
+        public override string Author => "0xNim & NeptuneSky";
         public override string MinimumGameVersionNecessary => "1.5.9.8";
         public override string ModVersion => "v1.0.0";
         public override string Description => "Adds a new menu for use with 0xNim's Mod Installer API.";
@@ -28,6 +28,7 @@ namespace ModInstaller
         
         public override void Load()
         {
+            Requests.ListMods(1, 0);
         }
         public override void Early_Load()
         {

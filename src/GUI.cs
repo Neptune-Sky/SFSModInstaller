@@ -78,7 +78,7 @@ namespace ModInstaller
             if (rightBottomPane != null) Destroy(rightBottomPane);
             
             Vector2Int windowDimensions = new Vector2Int(1000, 750);
-            rightBottomPane = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 260, 125);
+            rightBottomPane = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 260, 125, titleText: "");
         }
     }
 }

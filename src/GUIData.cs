@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using SFS.UI;
 using SFS.UI.ModGUI;
 using TMPro;
@@ -79,7 +80,7 @@ namespace ModInstaller
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         private static List<Button> buttons = new();
 
-        public static void Setup()
+        public static async void Setup()
         {
             if (window != null) Object.Destroy(window);
             
@@ -93,32 +94,42 @@ namespace ModInstaller
 
             for (var i = 0; i < 20; i++)
             {
-                Button button = Builder.CreateButton(window, 1050, 200);
+                Button button = Builder.CreateButton(window, 1050, 150);
                 button.gameObject.SetActive(false);
                 buttons.Add(button);
             }
+            await Requests.PullMods(20, 0);
             Regenerate();
         }
 
-        public static async void Regenerate()
+        public static void Regenerate()
         {
-            await Requests.PullMods(20, 0);
             if (Requests.results == null)
             {
-                Builder.CreateLabel(window, 200, 50, text: "An error occurred! Please try again.");
+                //Builder.CreateLabel(window, 200, 50, text: "An error occurred! Please try again.");
                 return;
             }
 
-            if (Requests.results.Length == 0)
+            if (Requests.results.Count == 0)
             {
-                Builder.CreateLabel(window, 200, 50, text: "No results");
+                //Builder.CreateLabel(window, 200, 50, text: "No results");
                 return;
             }
             var i = 0;
-            for (; i < Requests.results.Length; i++)
+            for (; i < Requests.results.Count; i++)
             {
                 Button button = buttons[i];
                 ModData mod = Requests.results[i];
+                if (mod.modTags != null)
+                {
+                    string[] tags = mod.modTags.Split(",");
+                    if (tags.Contains("test"))
+                    {
+                        Requests.results.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+                }
                 button.gameObject.SetActive(true);
                 button.Text = mod.modName;
                 button.OnClick = () =>
