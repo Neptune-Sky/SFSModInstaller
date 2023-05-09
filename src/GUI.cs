@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using SFS.UI.ModGUI;
 using SFS.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Button = SFS.UI.ModGUI.Button;
 
 namespace ModInstaller
 {
@@ -32,20 +35,25 @@ namespace ModInstaller
     }
     
     
+    
     public class GUI : MonoBehaviour
     {
+        public static GUI main;
         public static GameObject menuHolder;
-        private Window leftPane;
+        public Window leftPane;
+        private Window rightBottomPane;
         
         private void Awake()
         {
+            main = this;
+            if (menuHolder != null) Destroy(menuHolder);
             menuHolder = Builder.CreateHolder(Builder.SceneToAttach.BaseScene, "");
-            leftPane = LeftPane();
-            GenerateModList();
+            LeftPane();
+            ModList.Setup();
             RightBottomPane();
-            RightTopPane();
+            RightTopPane.Generate(menuHolder.transform);
         }
-
+        
         // KEEP THIS HERE INDEFINETLY
 
         /*private void OnGUI()
@@ -55,38 +63,22 @@ namespace ModInstaller
             UnityEngine.GUI.Box(new Rect(position.x, position.y, 100, 100), "asdkjfhhj");
         }*/
 
-        Window LeftPane()
+        private void LeftPane()
         {
+            if (leftPane != null) Destroy(leftPane);
+            
             Vector2Int windowDimensions = new Vector2Int(1500, 1250);
-            Window window = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 - 10 + 250, windowDimensions.y / 2, titleText: "Mod List");
-            Builder.CreateBox(window.gameObject.transform, 1100, 1100, 160, -675);
-
-            return window;
+            leftPane = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 - 10 + 250, windowDimensions.y / 2, titleText: "Mod List");
+            Builder.CreateBox(leftPane.gameObject.transform, 1100, 1100, 160, -675);
         }
 
-        async void GenerateModList()
-        {
-            Window modList = Builder.CreateWindow(leftPane.gameObject.transform, 1100, 1100, 160, -675);
-            modList.gameObject.transform.Find("Back (Game)").gameObject.SetActive(false);
-            modList.gameObject.transform.Find("Back (InGame)").gameObject.SetActive(false);
-            modList.gameObject.transform.Find("Title").gameObject.SetActive(false);
-            modList.gameObject.transform.Find("Mask").GetComponent<RectMask2D>().rectTransform.offsetMax += new Vector2(0, 40);
-            modList.gameObject.Rect().offsetMax =
-                new Vector2(modList.gameObject.Rect().offsetMax.x, 10);
 
-            await Requests.PullMods(1, 0);
-            Debug.Log(Requests.results[0].modName);
-        }
-        void RightTopPane()
+        private void RightBottomPane()
         {
-            Vector2Int windowDimensions = new Vector2Int(1000, 480);
-            Window window = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 260, windowDimensions.y + 145);
-        }
-
-        void RightBottomPane()
-        {
+            if (rightBottomPane != null) Destroy(rightBottomPane);
+            
             Vector2Int windowDimensions = new Vector2Int(1000, 750);
-            Window window = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 260, 125);
+            rightBottomPane = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 260, 125);
         }
     }
 }
