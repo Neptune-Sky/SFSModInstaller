@@ -38,20 +38,15 @@ namespace ModInstaller
     
     public class GUI : MonoBehaviour
     {
-        public static GUI main;
         public static GameObject menuHolder;
-        public Window leftPane;
         private Window rightBottomPane;
         
         private void Awake()
         {
-            main = this;
-            if (menuHolder != null) Destroy(menuHolder);
             menuHolder = Builder.CreateHolder(Builder.SceneToAttach.BaseScene, "");
-            LeftPane();
-            ModList.Setup();
+            LeftPane.Setup(menuHolder.transform);
             RightBottomPane();
-            RightTopPane.Generate(menuHolder.transform);
+            RightTopPane.Setup(menuHolder.transform);
         }
         
         // KEEP THIS HERE INDEFINETLY
@@ -62,15 +57,6 @@ namespace ModInstaller
             var position = menuHolder.transform.position;
             UnityEngine.GUI.Box(new Rect(position.x, position.y, 100, 100), "asdkjfhhj");
         }*/
-
-        private void LeftPane()
-        {
-            if (leftPane != null) Destroy(leftPane);
-            
-            Vector2Int windowDimensions = new Vector2Int(1500, 1250);
-            leftPane = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 - 10 + 250, windowDimensions.y / 2, titleText: "Mod List");
-            Builder.CreateBox(leftPane.gameObject.transform, 1100, 1100, 160, -675);
-        }
 
 
         private void RightBottomPane()
