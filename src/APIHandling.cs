@@ -21,6 +21,9 @@ namespace ModInstaller
         public string modReleaseDate;
         public string modTags;
         public string modIcon;
+        public string github;
+        public string forum;
+        public string donation;
     }
 
     [Serializable]
@@ -35,7 +38,7 @@ namespace ModInstaller
 
     public static class Requests 
 	{
-        private static readonly string modFolderPath = ModInstaller.Main.inst.ModFolder;
+        private static readonly string modFolderPath = Main.inst.ModFolder;
 
         public static List<ModData> results = new();
 
@@ -51,6 +54,23 @@ namespace ModInstaller
                 throw;
             }
         }
+
+        private static string GenerateEndpoint(string tags = "", string query = "", int offset = 0)
+        {
+            var endpoint = "/mods?limit=20";
+            if (tags != string.Empty) endpoint += "&tags=" + tags;
+            if (query != string.Empty) endpoint += "&q=" + query;
+            endpoint += "&offset=" + offset;
+            return endpoint;
+        }
+        
+        public static async Task PullMods(string tags = "", string query = "", int offset = 0)
+        {
+            string content = await GetAsync(GenerateEndpoint(tags, query, offset));
+
+            // Do something with the content, e.g. parse the JSON
+            SaveResults(content);
+        }
         
         private static async Task<string> GetAsync(string endpoint)
         {
@@ -65,12 +85,7 @@ namespace ModInstaller
             string content = await response.Content.ReadAsStringAsync();
             return content;
         }
-        private static async Task Main(string[] args)
-        {
-        string content = await GetAsync("/mods?limit=5");
-        Console.WriteLine(content); 
-        }
-        
+
         public static void DownloadFile(string url, string destinationFilePath)
         {
             using var client = new WebClient();
@@ -102,14 +117,7 @@ namespace ModInstaller
             // Do something with the content, e.g. parse the JSON
             Debug.Log(content);
         }
-        public static async Task PullMods(int limit, int offset)
-        {
-            var endpoint = $"/mods?limit={limit}&offset={offset}";
-            string content = await GetAsync(endpoint);
-
-            // Do something with the content, e.g. parse the JSON
-            SaveResults(content);
-        }
+        
         public static async Task GetMod(string modId)
         {
             // The mod ID is the ID of the mod not a number, e.g. "VanUp","UITools","SFS_ESM_UTILITY"
