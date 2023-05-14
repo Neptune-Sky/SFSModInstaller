@@ -2,7 +2,6 @@ using HarmonyLib;
 using ModLoader;
 using ModLoader.Helpers;
 using SFS.Audio;
-using SFS.Input;
 using SFS.Translations;
 using SFS.UI;
 using UnityEngine;
