@@ -40,8 +40,8 @@ namespace ModInstaller
         {
             menuHolder = Builder.CreateHolder(Builder.SceneToAttach.BaseScene, "");
             ModListPane.Setup(menuHolder.transform);
-            RightBottomPane.Setup(menuHolder.transform);
             ModInfoPane.Setup(menuHolder.transform);
+            RightBottomPane.Setup(menuHolder.transform);
         }
         
         // KEEP THIS HERE INDEFINETLY
