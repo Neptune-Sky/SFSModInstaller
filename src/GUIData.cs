@@ -6,6 +6,7 @@ using SFS.UI;
 using SFS.UI.ModGUI;
 using TMPro;
 using UnityEngine;
+using static SFS.UI.ModGUI.Builder;
 using Button = SFS.UI.ModGUI.Button;
 using Debug = UnityEngine.Debug;
 
@@ -18,8 +19,8 @@ namespace ModInstaller
         public static void Setup(Transform menuHolder)
         {
             var windowDimensions = new Vector2Int(1125, 1250);
-            window = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 - 10 + 250, windowDimensions.y / 2, titleText: "Mod List");
-            Box modListBox = Builder.CreateBox(window.gameObject.transform, 1100, 1100, 0, -675);
+            window = CreateWindow(menuHolder.transform, GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 + 140, windowDimensions.y / 2, titleText: "Mod List");
+            Box modListBox = CreateBox(window.gameObject.transform, 1100, 1100, 0, -675);
             ModList.Setup(modListBox);
         }
     }
@@ -29,12 +30,14 @@ namespace ModInstaller
         private static Window window;
 
         private static readonly List<Button> buttons = new();
+        private static Label noResults;
+        private static Label error;
 
         public static async void Setup(Box box)
         {
             if (window != null) Object.Destroy(window);
 
-            window = Builder.CreateWindow(box.gameObject.transform, Builder.GetRandomID(), (int)box.Size.x, (int)box.Size.y + 40, 0, (int)box.Size.y / 2 + 40);
+            window = CreateWindow(box.gameObject.transform, GetRandomID(), (int)box.Size.x, (int)box.Size.y + 40, 0, (int)box.Size.y / 2 + 40);
             window.gameObject.transform.Find("Back (Game)").gameObject.SetActive(false);
             window.gameObject.transform.Find("Back (InGame)").gameObject.SetActive(false);
             window.gameObject.transform.Find("Title").gameObject.SetActive(false);
@@ -42,9 +45,14 @@ namespace ModInstaller
             window.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter, 5f, disableChildSizeControl: true);
             window.EnableScrolling(Type.Vertical);
 
+            noResults = CreateLabel(window, 1050, 30, text: "No results found!");
+            error = CreateLabel(window, 1050, 30, text: "An error occurred! Please try again.");
+            noResults.gameObject.SetActive(false);
+            error.gameObject.SetActive(false);
+
             for (var i = 0; i < 20; i++)
             {
-                Button button = Builder.CreateButton(window, 1050, 150);
+                Button button = CreateButton(window, 1075, 150);
                 button.gameObject.SetActive(false);
                 buttons.Add(button);
             }
@@ -56,18 +64,31 @@ namespace ModInstaller
         public static async Task Regenerate(string searchTags = "" , string searchQuery = "", int offset = 0)
         {
             await Requests.PullMods(searchTags, searchQuery, offset);
+
+            void DisableAllButtons()
+            {
+                buttons.ForEach((button) =>
+                {
+                    button.gameObject.SetActive(false);
+                });
+            }
+            
             if (Requests.results == null)
             {
-                //Builder.CreateLabel(window, 200, 50, text: "An error occurred! Please try again.");
+                DisableAllButtons();
+                error.gameObject.SetActive(true);
                 return;
             }
 
             if (Requests.results.Count == 0)
             {
-                //Builder.CreateLabel(window, 200, 50, text: "No results");
+                DisableAllButtons();
+                noResults.gameObject.SetActive(true);
                 return;
             }
-
+            error.gameObject.SetActive(false);
+            noResults.gameObject.SetActive(false);
+            
             var i = 0;
             for (; i < Requests.results.Count; i++)
             {
@@ -88,7 +109,7 @@ namespace ModInstaller
                 button.Text = mod.modName;
                 button.OnClick = () =>
                 {
-                    RightPane.Regenerate(mod.modName, mod.modVersion, mod.github, mod.forum);
+                    RightPane.Regenerate(mod);
                     Debug.Log(JsonUtility.ToJson(mod));
                 };
                 // button.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
@@ -110,6 +131,7 @@ namespace ModInstaller
         private static Window window;
         private static Label modName;
         private static Label modVersion;
+        private static Label description;
 
         private static Button gitButton;
         private static Button forumsButton;
@@ -120,53 +142,80 @@ namespace ModInstaller
         {   
             if (window != null) Object.Destroy(window);
             Vector2Int windowDimensions = new (800, 600);
-            window = Builder.CreateWindow(menuHolder, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y,
-                windowDimensions.x / 2 + 260, windowDimensions.y + 25);
+            window = CreateWindow(menuHolder, GetRandomID(), windowDimensions.x, windowDimensions.y,
+                windowDimensions.x / 2 + 156, windowDimensions.y + 25, titleText: "Details");
 
-            window.CreateLayoutGroup(Type.Vertical);
+            window.CreateLayoutGroup(Type.Vertical, spacing: 10);
 
-            Container labels = Builder.CreateContainer(window);
+            Container labels = CreateContainer(window);
             labels.CreateLayoutGroup(Type.Horizontal, TextAnchor.MiddleLeft, 5f);
-            modName = Builder.CreateLabel(labels, 385, 50, text: "Mod Name");
+            modName = CreateLabel(labels, 385, 50, text: "");
             modName.TextAlignment = TextAlignmentOptions.Left;
-            modVersion = Builder.CreateLabel(labels, 385, 50, text: "");
+            modVersion = CreateLabel(labels, 385, 50, text: "");
             modVersion.TextAlignment = TextAlignmentOptions.Right;
+            CreateSeparator(window, windowDimensions.x - 20);
+            CreateLabel(window, windowDimensions.x - 20, 50, text: "Description:").TextAlignment = TextAlignmentOptions.Left;
+            Box box = CreateBox(window, 790, 310);
+            box.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperLeft, 0, new RectOffset(10, 5, 20, 5));
+            description = CreateLabel(box, 775, 290);
+            description.TextAlignment = TextAlignmentOptions.TopLeft;
+            description.AutoFontResize = false;
+            description.FontSize = 30;
 
-            Container buttons = Builder.CreateContainer(window);
+            Container buttons = CreateContainer(window);
             buttons.CreateLayoutGroup(Type.Horizontal, spacing: 8f);
-            gitButton = Builder.CreateButton(buttons, 228, 60, text: "GitHub");
+            gitButton = CreateButton(buttons, 228, 60, text: "GitHub");
             gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            forumsButton = Builder.CreateButton(buttons, 228, 60, text: "Forums");
+            forumsButton = CreateButton(buttons, 228, 60, text: "Forums");
             forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            installButton = Builder.CreateButton(buttons, 228, 60, text: "Install");
+            installButton = CreateButton(buttons, 228, 60, text: "Install");
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
         }
 
-        public static void Regenerate(string name = "", string version = "", string gitRepo = "",
-            string forumsThread = "", string installURL = "")
+        public static void Regenerate(ModData modData)
         {
-            modName.Text = name;
-            modVersion.Text = version;
+            modName.Text = modData.modName;
+            modVersion.Text = modData.modVersion;
+            description.Text = modData.modDescription;
 
-            if (gitRepo == "") gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            else
+
+            if (modData.github == null)
             {
                 gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-                gitButton.OnClick = () => Process.Start(gitRepo);
+            }
+            else
+            {
+                gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
+                gitButton.OnClick = () => Process.Start(modData.github);
             }
 
-            if (forumsThread == "") forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            if (modData.forum == null)
+            {
+                forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            }
             else
             {
                 forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
-                forumsButton.OnClick = () => Process.Start(forumsThread);
+                forumsButton.OnClick = () => Process.Start(modData.forum);
             }
 
-            if (installURL == "") installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            /*if ("installURL" == "") installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             else
             {
                 installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
-            }
+            }*/
+        }
+    }
+
+    internal static class RightBottomPane
+    {
+        private static Window window;
+        public static void Setup(Transform menuHolder)
+        {
+            if (window != null) Object.Destroy(window);
+            
+            Vector2Int windowDimensions = new Vector2Int(800, 634);
+            window = CreateWindow(menuHolder, GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 156, 8, titleText: "");
         }
     }
 }
