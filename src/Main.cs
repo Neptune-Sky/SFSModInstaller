@@ -26,9 +26,9 @@ namespace ModInstaller
 
         public static bool DisableModUpdates => true;
         
-        public override void Load()
+        public override async void Load()
         {
-            Requests.ListMods(1, 0);
+            await Requests.ListMods(20, 0);
         }
         public override void Early_Load()
         {
@@ -53,11 +53,11 @@ namespace ModInstaller
             //click events
             buttonPC.holdEvent = new HoldUnityEvent();
             buttonPC.clickEvent = new ClickUnityEvent();
-            buttonPC.clickEvent.AddListener(delegate
+            buttonPC.clickEvent.AddListener(async delegate
             {
                 SoundPlayer.main.clickSound.Play();
                 InstallerMenu.main.Open();
-                Requests.VersionNumberToVersionID("UITools");
+                await Requests.VersionNumberToVersionID("UITools");
             });
 
             // screen position
