@@ -12,7 +12,7 @@ using Debug = UnityEngine.Debug;
 
 namespace ModInstaller
 {
-    internal static class LeftPane
+    internal static class ModListPane
     {
         private static Window window;
 
@@ -109,7 +109,7 @@ namespace ModInstaller
                 button.Text = mod.modName;
                 button.OnClick = () =>
                 {
-                    RightPane.Regenerate(mod);
+                    ModInfoPane.Regenerate(mod);
                     Debug.Log(JsonUtility.ToJson(mod));
                 };
                 // button.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
@@ -126,7 +126,7 @@ namespace ModInstaller
         }
     }
 
-    internal static class RightPane
+    internal static class ModInfoPane
     {
         private static Window window;
         private static Label modName;

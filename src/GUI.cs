@@ -39,9 +39,9 @@ namespace ModInstaller
         private void Awake()
         {
             menuHolder = Builder.CreateHolder(Builder.SceneToAttach.BaseScene, "");
-            LeftPane.Setup(menuHolder.transform);
+            ModListPane.Setup(menuHolder.transform);
             RightBottomPane.Setup(menuHolder.transform);
-            RightPane.Setup(menuHolder.transform);
+            ModInfoPane.Setup(menuHolder.transform);
         }
         
         // KEEP THIS HERE INDEFINETLY
