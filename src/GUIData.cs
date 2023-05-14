@@ -1,33 +1,34 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using SFS.UI;
 using SFS.UI.ModGUI;
 using TMPro;
 using UnityEngine;
 using Button = SFS.UI.ModGUI.Button;
+using Debug = UnityEngine.Debug;
 
 namespace ModInstaller
 {
     internal static class LeftPane
     {
-        public static Window window;
+        private static Window window;
 
         public static void Setup(Transform menuHolder)
         {
-            Vector2Int windowDimensions = new Vector2Int(1500, 1250);
+            var windowDimensions = new Vector2Int(1125, 1250);
             window = Builder.CreateWindow(menuHolder.transform, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 - 10 + 250, windowDimensions.y / 2, titleText: "Mod List");
-            Box modListBox = Builder.CreateBox(window.gameObject.transform, 1100, 1100, 160, -675);
+            Box modListBox = Builder.CreateBox(window.gameObject.transform, 1100, 1100, 0, -675);
             ModList.Setup(modListBox);
         }
     }
 
-    public static class ModList
+    internal static class ModList
     {
         private static Window window;
 
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        private static List<Button> buttons = new();
+        private static readonly List<Button> buttons = new();
 
         public static async void Setup(Box box)
         {
@@ -48,12 +49,13 @@ namespace ModInstaller
                 buttons.Add(button);
             }
 
-            await Requests.PullMods(20, 0);
-            Regenerate();
+            // await Requests.PullMods(20, 0);
+            await Regenerate();
         }
 
-        public static void Regenerate()
+        public static async Task Regenerate(string searchTags = "" , string searchQuery = "", int offset = 0)
         {
+            await Requests.PullMods(searchTags, searchQuery, offset);
             if (Requests.results == null)
             {
                 //Builder.CreateLabel(window, 200, 50, text: "An error occurred! Please try again.");
@@ -73,8 +75,8 @@ namespace ModInstaller
                 ModData mod = Requests.results[i];
                 if (mod.modTags != null)
                 {
-                    string[] tags = mod.modTags.Split(",");
-                    if (tags.Contains("test"))
+                    string[] modtags = mod.modTags.Split(',');
+                    if (modtags.Contains("test"))
                     {
                         Requests.results.RemoveAt(i);
                         i--;
@@ -84,7 +86,11 @@ namespace ModInstaller
 
                 button.gameObject.SetActive(true);
                 button.Text = mod.modName;
-                button.OnClick = () => { RightTopPane.Regenerate(mod.modName, mod.modVersion); };
+                button.OnClick = () =>
+                {
+                    RightPane.Regenerate(mod.modName, mod.modVersion, mod.github, mod.forum);
+                    Debug.Log(JsonUtility.ToJson(mod));
+                };
                 // button.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             }
 
@@ -99,7 +105,7 @@ namespace ModInstaller
         }
     }
 
-    internal static class RightTopPane
+    internal static class RightPane
     {
         private static Window window;
         private static Label modName;
@@ -113,50 +119,50 @@ namespace ModInstaller
         public static void Setup(Transform menuHolder)
         {   
             if (window != null) Object.Destroy(window);
-            Vector2Int windowDimensions = new (1000, 480);
+            Vector2Int windowDimensions = new (800, 600);
             window = Builder.CreateWindow(menuHolder, Builder.GetRandomID(), windowDimensions.x, windowDimensions.y,
-                windowDimensions.x / 2 + 260, windowDimensions.y + 145);
+                windowDimensions.x / 2 + 260, windowDimensions.y + 25);
 
             window.CreateLayoutGroup(Type.Vertical);
 
             Container labels = Builder.CreateContainer(window);
             labels.CreateLayoutGroup(Type.Horizontal, TextAnchor.MiddleLeft, 5f);
-            modName = Builder.CreateLabel(labels, 475, 50, text: "Mod Name");
+            modName = Builder.CreateLabel(labels, 385, 50, text: "Mod Name");
             modName.TextAlignment = TextAlignmentOptions.Left;
-            modVersion = Builder.CreateLabel(labels, 475, 50, text: "");
+            modVersion = Builder.CreateLabel(labels, 385, 50, text: "");
             modVersion.TextAlignment = TextAlignmentOptions.Right;
 
             Container buttons = Builder.CreateContainer(window);
-            buttons.CreateLayoutGroup(Type.Horizontal, spacing: 5f);
-            gitButton = Builder.CreateButton(buttons, 325, 60, text: "GitHub");
+            buttons.CreateLayoutGroup(Type.Horizontal, spacing: 8f);
+            gitButton = Builder.CreateButton(buttons, 228, 60, text: "GitHub");
             gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            forumsButton = Builder.CreateButton(buttons, 325, 60, text: "Forums");
+            forumsButton = Builder.CreateButton(buttons, 228, 60, text: "Forums");
             forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            installButton = Builder.CreateButton(buttons, 325, 60, text: "Install");
+            installButton = Builder.CreateButton(buttons, 228, 60, text: "Install");
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
         }
 
-        public static void Regenerate(string name = "", string version = "", string gitRepo = null,
-            string forumsThread = null, string installURL = null)
+        public static void Regenerate(string name = "", string version = "", string gitRepo = "",
+            string forumsThread = "", string installURL = "")
         {
             modName.Text = name;
             modVersion.Text = version;
 
-            if (gitRepo == null) gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            if (gitRepo == "") gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             else
             {
                 gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
                 gitButton.OnClick = () => Process.Start(gitRepo);
             }
 
-            if (forumsThread == null) forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            if (forumsThread == "") forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             else
             {
                 forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
                 forumsButton.OnClick = () => Process.Start(forumsThread);
             }
 
-            if (installURL == null) installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            if (installURL == "") installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             else
             {
                 installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
