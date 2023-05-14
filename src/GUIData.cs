@@ -20,7 +20,11 @@ namespace ModInstaller
         {
             var windowDimensions = new Vector2Int(1125, 1250);
             window = CreateWindow(menuHolder.transform, GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 + 140, windowDimensions.y / 2, titleText: "Mod List");
-            Box modListBox = CreateBox(window.gameObject.transform, 1100, 1100, 0, -675);
+            window.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter);
+            // window.gameObject.transform.Find("Back (Game)").gameObject.SetActive(false);
+            // window.gameObject.transform.Find("Back (InGame)").gameObject.SetActive(false);
+
+            Box modListBox = CreateBox(window.gameObject.transform, 1100, 1175, 0, -windowDimensions.y / 2 - 25);
             ModList.Setup(modListBox);
         }
     }
@@ -30,10 +34,13 @@ namespace ModInstaller
         private static Window window;
 
         private static readonly List<Button> buttons = new();
+        private static Button activeButton;
+        
         private static Label noResults;
         private static Label error;
+        private static Label loading;
 
-        public static async void Setup(Box box)
+        public static void Setup(Box box)
         {
             if (window != null) Object.Destroy(window);
 
@@ -45,50 +52,45 @@ namespace ModInstaller
             window.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter, 5f, disableChildSizeControl: true);
             window.EnableScrolling(Type.Vertical);
 
-            noResults = CreateLabel(window, 1050, 30, text: "No results found!");
-            error = CreateLabel(window, 1050, 30, text: "An error occurred! Please try again.");
+            noResults = CreateLabel(box, 1050, 60, text: "No results found!");
+            error = CreateLabel(box, 1050, 60, text: "An error occurred! Please try again.");
+            loading = CreateLabel(box, 1050, 60, text: "Loading...");
             noResults.gameObject.SetActive(false);
             error.gameObject.SetActive(false);
 
             for (var i = 0; i < 20; i++)
             {
-                Button button = CreateButton(window, 1075, 150);
+                Button button = CreateButton(window, 1075, 140);
                 button.gameObject.SetActive(false);
                 buttons.Add(button);
             }
-
-            // await Requests.PullMods(20, 0);
-            await Regenerate();
+            
+            Regenerate();
         }
 
-        public static async Task Regenerate(string searchTags = "" , string searchQuery = "", int offset = 0)
+        public static async void Regenerate(string searchTags = "", string searchQuery = "", int offset = 0)
         {
+            window.gameObject.SetActive(false);
+            activeButton?.gameObject.GetComponent<ButtonPC>().SetSelected(false);
+            error.gameObject.SetActive(false);
+            noResults.gameObject.SetActive(false);
+            
+            loading.gameObject.SetActive(true);
             await Requests.PullMods(searchTags, searchQuery, offset);
-
-            void DisableAllButtons()
-            {
-                buttons.ForEach((button) =>
-                {
-                    button.gameObject.SetActive(false);
-                });
-            }
+            loading.gameObject.SetActive(false);
             
             if (Requests.results == null)
             {
-                DisableAllButtons();
                 error.gameObject.SetActive(true);
                 return;
             }
 
             if (Requests.results.Count == 0)
             {
-                DisableAllButtons();
                 noResults.gameObject.SetActive(true);
                 return;
             }
-            error.gameObject.SetActive(false);
-            noResults.gameObject.SetActive(false);
-            
+
             var i = 0;
             for (; i < Requests.results.Count; i++)
             {
@@ -110,11 +112,14 @@ namespace ModInstaller
                 button.OnClick = () =>
                 {
                     ModInfoPane.Regenerate(mod);
-                    Debug.Log(JsonUtility.ToJson(mod));
+                    // Debug.Log(JsonUtility.ToJson(mod));
+                    activeButton?.gameObject.GetComponent<ButtonPC>().SetSelected(false);
+                    activeButton = button;
+                    activeButton.gameObject.GetComponent<ButtonPC>().SetSelected(true);
                 };
                 // button.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             }
-
+            
             if (i >= buttons.Count - 1) return;
 
             for (; i < buttons.Count; i++)
@@ -122,7 +127,7 @@ namespace ModInstaller
                 Button button = buttons[i];
                 button.gameObject.SetActive(false);
             }
-
+            window.gameObject.SetActive(true);
         }
     }
 
@@ -154,10 +159,10 @@ namespace ModInstaller
             modVersion = CreateLabel(labels, 385, 50, text: "");
             modVersion.TextAlignment = TextAlignmentOptions.Right;
             CreateSeparator(window, windowDimensions.x - 20);
-            CreateLabel(window, windowDimensions.x - 20, 50, text: "Description:").TextAlignment = TextAlignmentOptions.Left;
-            Box box = CreateBox(window, 790, 310);
+            CreateLabel(window, windowDimensions.x - 30, 50, text: "Description:").TextAlignment = TextAlignmentOptions.Left;
+            Box box = CreateBox(window, 780, 310);
             box.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperLeft, 0, new RectOffset(10, 5, 20, 5));
-            description = CreateLabel(box, 775, 290);
+            description = CreateLabel(box, 765, 290);
             description.TextAlignment = TextAlignmentOptions.TopLeft;
             description.AutoFontResize = false;
             description.FontSize = 30;
@@ -210,12 +215,47 @@ namespace ModInstaller
     internal static class RightBottomPane
     {
         private static Window window;
+        
+        private static TextInput searchQuery;
+        private static TextInput tagsQuery;
+
+        private static bool fieldsChanged = false;
         public static void Setup(Transform menuHolder)
         {
             if (window != null) Object.Destroy(window);
             
-            Vector2Int windowDimensions = new Vector2Int(800, 634);
+            var windowDimensions = new Vector2Int(800, 634);
             window = CreateWindow(menuHolder, GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 156, 8, titleText: "");
+            window.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter, 10);
+
+            Container searchContainer = CreateContainer(window);
+            searchContainer.CreateLayoutGroup(Type.Vertical, spacing: 2);
+            CreateLabel(searchContainer, 450, 45, text: "Search by Title:");
+            searchQuery = CreateTextInput(searchContainer, 450, 50, onChange: _ => fieldsChanged = true, text: "");
+
+            Container tagContainer = CreateContainer(window);
+            tagContainer.CreateLayoutGroup(Type.Vertical, spacing: 2);
+            CreateLabel(tagContainer, 450, 45, text: "Search by Tag (Separate Tags with Commas):");
+            tagsQuery = CreateTextInput(tagContainer, 450, 50, onChange: _ => fieldsChanged = true, text: "");
+
+            Container confirmContainer = CreateContainer(window);
+            confirmContainer.CreateLayoutGroup(Type.Horizontal, spacing: 3);
+            CreateButton(confirmContainer, 125, 47, onClick: () =>
+            {
+                if (!fieldsChanged && searchQuery.Text == "" && tagsQuery.Text == "") return;
+                searchQuery.Text = "";
+                tagsQuery.Text = "";
+                fieldsChanged = false;
+                ModInfoPane.Regenerate(new ModData());
+                ModList.Regenerate();
+            }, text: "Clear");
+            CreateButton(confirmContainer, 125, 47, onClick: () =>
+            {
+                if (!fieldsChanged) return;
+                fieldsChanged = false;
+                ModInfoPane.Regenerate(new ModData());
+                ModList.Regenerate(tagsQuery.Text, searchQuery.Text);
+            }, text: "Search");
         }
     }
 }
