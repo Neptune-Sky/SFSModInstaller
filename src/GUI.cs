@@ -1,10 +1,6 @@
-using System.Diagnostics;
 using SFS.UI.ModGUI;
 using SFS.UI;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using Button = SFS.UI.ModGUI.Button;
 
 namespace ModInstaller
 {
