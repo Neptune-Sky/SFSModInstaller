@@ -14,10 +14,10 @@ namespace ModInstaller
     public class ModData
     {
         public string modID;
-        public string modName;
-        public string modDescription;
-        public string modAuthor;
-        public string modVersion;
+        public string modName = "";
+        public string modDescription = "";
+        public string modAuthor = "";
+        public string modVersion = "";
         public string modReleaseDate;
         public string modTags;
         public string modIcon;
@@ -58,8 +58,8 @@ namespace ModInstaller
         private static string GenerateEndpoint(string tags = "", string query = "", int offset = 0)
         {
             var endpoint = "/mods?limit=20";
-            if (tags != string.Empty) endpoint += "&tags=" + tags;
-            if (query != string.Empty) endpoint += "&q=" + query;
+            if (tags is not (null or "")) endpoint += "&tags=" + tags;
+            if (query is not (null or "")) endpoint += "&q=" + query;
             endpoint += "&offset=" + offset;
             return endpoint;
         }
@@ -78,11 +78,23 @@ namespace ModInstaller
             // Debug.Log(url);
             using var client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(url);
-            
+
+            string content;
             if (!response.IsSuccessStatusCode)
-                throw new Exception($"Failed to get data. Status code: {response.StatusCode}");
-            
-            string content = await response.Content.ReadAsStringAsync();
+            {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    content = "[]";
+                }
+                else
+                {
+                    throw new Exception($"Failed to get data. Status code: {response.StatusCode}");
+                }
+
+                return content;
+            }
+
+            content = await response.Content.ReadAsStringAsync();
             return content;
         }
 
