@@ -90,11 +90,14 @@ namespace ModInstaller.GUI
                 forumsButton.OnClick = () => Process.Start(modData.forum);
             }
 
-            /*if ("installURL" == "") installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            else
+            /*if (installed)
             {
                 installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
-            }*/
+            }
+            else
+            {
+                installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            } */
         }
     }
 }

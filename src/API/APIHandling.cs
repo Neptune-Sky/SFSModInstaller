@@ -224,5 +224,28 @@ namespace ModInstaller.API
             return new List<(string, string)>(); // Default return value if downloadDataList is not found
         }
 
+        public static bool CheckInstallable(string modID)
+        {
+            try
+            {
+                var endpoint = $"/installable/{modID}";
+                string content = GetAsync(endpoint).Result;
+
+                if (bool.TryParse(content, out bool installable))
+                {
+                    return installable;
+                }
+                else
+                {
+                    // Handle the case when the content is not a valid boolean value
+                    throw new InvalidOperationException("Invalid installable value returned.");
+                }
+            }
+            catch (Exception)
+            {
+                // Handle any exceptions that occurred during the request or parsing
+                throw;
+            }
+        }
     }
 }
