@@ -62,6 +62,7 @@ namespace ModInstaller
             {
                 SoundPlayer.main.clickSound.Play();
                 InstallerMenu.main.Open();
+                InstallHandling.InstallMod("UITools");
             });
         }
     }

@@ -34,7 +34,7 @@ namespace ModInstaller
         //Debug.Log("Mod installed");
 
 
-        public static async Task InstallMod(string modID, string versionNumber)
+        public static async Task InstallMod(string modID, string versionNumber = "latest")
         {
             int versionID = await Requests.VersionNumberToVersionID(modID, versionNumber);
 
@@ -53,7 +53,7 @@ namespace ModInstaller
                     string fileName = fileURL.Substring(fileURL.LastIndexOf('/') + 1);
 
                     string modFolderPathTemp = Main.modFolder.ToString();
-                    string modFolderPath = modFolderPathTemp.Replace("SFSMod", "");
+                    string modFolderPath = modFolderPathTemp.Replace("ModInstaller", "");
 
                     // Download the mod using fileURL and fileType
                     // if file type = plugin,mod,pack,texture
