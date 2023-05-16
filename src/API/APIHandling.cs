@@ -94,7 +94,7 @@ namespace ModInstaller.API
 
         public static void DownloadAndUnzipFile(string url, string destinationFolderPath)
         {
-            using var client = new WebClient())
+            using var client = new WebClient();
             string tempZipFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".zip");
             client.DownloadFile(url, tempZipFilePath);
             ZipFile.ExtractToDirectory(tempZipFilePath, destinationFolderPath);

@@ -1,8 +1,10 @@
 using ModInstaller.API;
 using System.Collections.Generic;
-using System.Diagnostics;
+//using System.Diagnostics;
 using System.Threading.Tasks;
 using UnityEngine;
+using System;
+
 
 namespace ModInstaller
 {
@@ -63,12 +65,12 @@ namespace ModInstaller
                     {
                         try
                         {
-                            Requests.DownloadAndUnzipFile(fileUrl, modFolderPath);
-                            Debug.Log("Zip file downloaded and extracted successfully.");
+                            Requests.DownloadAndUnzipFile(fileURL, modFolderPath);
+                            //Debug.Log("Zip file downloaded and extracted successfully.");
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            Debug.Log("Error downloading and extracting zip file: " + ex.Message);
+                            
                         }
                     }
 
