@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ModInstaller.GUI;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -32,7 +33,7 @@ namespace ModInstaller.API
 
         private static string GenerateEndpoint(string tags = "", string query = "", int offset = 0)
         {
-            var endpoint = "/mods?limit=20";
+            string endpoint = "/mods?limit=" + InstallerMenu.maxModsPerPage;
             if (tags is not (null or "")) endpoint += "&tags=" + tags;
             if (query is not (null or "")) endpoint += "&q=" + query;
             if (offset > 0) endpoint += "&offset=" + offset;

@@ -7,6 +7,7 @@ namespace ModInstaller.GUI
     public class InstallerMenu : BasicMenu
     {
         public static InstallerMenu main;
+        public static int maxModsPerPage = 10;
 
         private void Awake()
         {
