@@ -27,4 +27,11 @@ namespace ModInstaller.API
         public string releaseDate;
         public string changelog;
     }
+
+    [Serializable]
+    public class DownloadData
+    {
+        public string fileType;
+        public string fileURL;
+    }
 }

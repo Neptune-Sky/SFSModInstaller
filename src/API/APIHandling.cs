@@ -154,49 +154,64 @@ namespace ModInstaller.API
             Debug.Log(content);
         }
 
-        public static async Task SearchMods(string query, int limit, int offset)
+
+        public static async Task<int> VersionNumberToVersionID(string modID, string versionNumber = "latest")
         {
-            var endpoint = $"/search/{query}?limit={limit}&offset={offset}";
-            string content = await GetAsync(endpoint);
-
-            // Do something with the content, e.g. parse the JSON
-            Debug.Log(content);
-        }
-
-        public static async Task SearchTags(string query, int limit, int offset)
-        {
-            var endpoint = $"/tags/{query}?limit={limit}&offset={offset}";
-            string content = await GetAsync(endpoint);
-
-            // Do something with the content, e.g. parse the JSON
-            Debug.Log(content);
-        }
-        
-
-        public static ModVersionData versionResults;
-        
-        public static async Task VersionNumberToVersionID(string modID, string versionNumber = "latest")
-        {
-            Debug.Log("check1");
-            // Convert modID and versionNumber to versionID
-            // By requesting /all/:modID/:versionNumber
             var endpoint = $"/version/alternative/{modID}/{versionNumber}";
             string json = await GetAsync(endpoint);
 
             try
             {
-                Debug.Log("check2");
-                versionResults = JsonConvert.DeserializeObject<ModVersionData>(json);
-                Debug.Log("check3");
+                var versionData = JsonConvert.DeserializeObject<ModVersionData>(json);
+                if (versionData != null)
+                {
+                    return versionData.modVersionID;
+                }
+                else
+                {
+                    // Handle the case where versionData is null (error occurred)
+                    // ...
+                }
             }
             catch (Exception)
             {
-                versionResults = null;
+                // Handle the exception
                 throw;
             }
-            Debug.Log("check4");
-            Debug.Log(versionResults);
-            
+
+            return -1; // Default return value if modVersionID is not found
         }
+
+        public static async Task<List<(string, string)>> GetDownloadLinks(int modVersionID)
+        {
+            var endpoint = $"/download/{modVersionID}";
+            string content = await GetAsync(endpoint);
+
+            try
+            {
+                var downloadDataList = JsonConvert.DeserializeObject<List<DownloadData>>(content);
+                if (downloadDataList != null && downloadDataList.Count > 0)
+                {
+                    List<(string, string)> downloadLinks = downloadDataList
+                        .Select(downloadData => (downloadData.fileURL, downloadData.fileType))
+                        .ToList();
+
+                    return downloadLinks;
+                }
+                else
+                {
+                    // Handle the case where downloadDataList is null or empty (no download links found)
+                    // ...
+                }
+            }
+            catch (Exception)
+            {
+                // Handle the exception
+                throw;
+            }
+
+            return new List<(string, string)>(); // Default return value if downloadDataList is not found
+        }
+
     }
 }

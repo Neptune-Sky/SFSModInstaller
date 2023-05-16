@@ -4,6 +4,7 @@ using ModInstaller.GUI;
 using ModLoader;
 using ModLoader.Helpers;
 using SFS.Audio;
+using SFS.IO;
 using SFS.Translations;
 using SFS.UI;
 using UnityEngine;
@@ -29,12 +30,17 @@ namespace ModInstaller
         public static bool DisableModUpdates => true;
         
         public override void Load() {}
+
+        public static FolderPath modFolder;
+
         public override void Early_Load()
         {
             inst = this;
             SceneHelper.OnHomeSceneLoaded += insertModsButton;
             patcher = new Harmony(ModNameID);
             patcher.PatchAll();
+
+            modFolder = new FolderPath(ModFolder);
         }
         
         private static void insertModsButton()
