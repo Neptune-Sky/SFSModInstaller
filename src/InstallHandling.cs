@@ -50,16 +50,27 @@ namespace ModInstaller
                     string fileType = downloadLink.fileType;
                     string fileName = fileURL.Substring(fileURL.LastIndexOf('/') + 1);
 
-                    string modFolderPathTemp = MyMod.modFolder.ToString();
-                    string modFolderPath = modFolderPath.Replace("SFSMod", "");
+                    string modFolderPathTemp = Main.modFolder.ToString();
+                    string modFolderPath = modFolderPathTemp.Replace("SFSMod", "");
 
                     // Download the mod using fileURL and fileType
                     // if file type = plugin,mod,pack,texture
-                    if (fileType == "plugin") await Requests.DownloadFile(fileURL, + modFolderPath + "Plugins" + fileName);
-                    if (fileType == "mod") await Requests.DownloadFile(fileURL, + modFolderPath + "/" + fileName);
-                    if (fileType == "pack") await Requests.DownloadFile(fileURL, + modFolderPath + "/Custom Assets/Packs" + fileName);
-                    if (fileType == "texture") await Requests.DownloadFile(fileURL, + modFolderPath + "/Custom Assets/Textures" + fileName);
-                    if (fileType == "mod-zip") await Requests.DownloadFile(fileURL, + modFolderPath + "/Custom Assets/Sounds" + fileName);
+                    if (fileType == "plugin") Requests.DownloadFile(fileURL, modFolderPath + "Plugins" + fileName);
+                    if (fileType == "mod") Requests.DownloadFile(fileURL, modFolderPath + "/" + fileName);
+                    if (fileType == "pack") Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Packs" + fileName);
+                    if (fileType == "texture") Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Textures" + fileName);
+                    if (fileType == "mod-zip")
+                    {
+                        try
+                        {
+                            Requests.DownloadAndUnzipFile(fileUrl, modFolderPath);
+                            Debug.Log("Zip file downloaded and extracted successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.Log("Error downloading and extracting zip file: " + ex.Message);
+                        }
+                    }
 
                 }
             }
