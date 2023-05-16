@@ -73,8 +73,10 @@ namespace ModInstaller.GUI
             noResults.gameObject.SetActive(false);
             
             loading.gameObject.SetActive(true);
+            SearchPane.PageButtonsEnabled(false);
             await Requests.PullMods(searchTags, searchQuery, offset);
             loading.gameObject.SetActive(false);
+            
             
             if (Requests.results == null)
             {
@@ -87,7 +89,8 @@ namespace ModInstaller.GUI
                 noResults.gameObject.SetActive(true);
                 return;
             }
-
+            SearchPane.PageButtonsEnabled(true);
+            
             var i = 0;
             for (; i < Requests.results.Count; i++)
             {

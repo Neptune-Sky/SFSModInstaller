@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ModInstaller.GUI;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -31,10 +33,10 @@ namespace ModInstaller.API
 
         private static string GenerateEndpoint(string tags = "", string query = "", int offset = 0)
         {
-            var endpoint = "/mods?limit=20";
+            string endpoint = "/mods?limit=" + InstallerMenu.maxModsPerPage;
             if (tags is not (null or "")) endpoint += "&tags=" + tags;
             if (query is not (null or "")) endpoint += "&q=" + query;
-            endpoint += "&offset=" + offset;
+            if (offset > 0) endpoint += "&offset=" + offset;
             return endpoint;
         }
         
@@ -99,11 +101,18 @@ namespace ModInstaller.API
             Debug.Log(content);
         }
 
-        public static async Task GetModCount(string tags, string query)
+        public static async Task<int> GetModCount(string tags = "", string query = "")
         {
             // Currently takes input with tags already seperated by commas
-            string content = await GetAsync($"/total/mods?tags={tags}&q={query}");
-            Debug.Log(content);
+            var count = 0;
+            try
+            {
+                string content = await GetAsync("/total" + GenerateEndpoint(tags, query));
+                count = int.Parse(content);
+            }
+            catch (Exception) { /* ignore */ }
+
+            return count;
         }
         public static async Task ListMods(int limit, int offset)
         {

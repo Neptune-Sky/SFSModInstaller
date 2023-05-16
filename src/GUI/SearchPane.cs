@@ -1,7 +1,13 @@
+using System;
+using System.Collections.Generic;
 using ModInstaller.API;
+using SFS.UI;
 using SFS.UI.ModGUI;
 using UnityEngine;
 using static SFS.UI.ModGUI.Builder;
+using Button = SFS.UI.ModGUI.Button;
+using Object = UnityEngine.Object;
+using Type = SFS.UI.ModGUI.Type;
 
 namespace ModInstaller.GUI
 {
@@ -12,11 +18,19 @@ namespace ModInstaller.GUI
         private static TextInput searchQuery;
         private static TextInput tagsQuery;
 
-        private static bool fieldsChanged = false;
+        private static Label pagesText;
+        private static readonly List<Button> pageButtons = new();
+
+        private static bool fieldsChanged;
+        
+        private static int results = 0;
+        private static int page = 1;
+        private static int totalPages = 1;
+        
         public static void Setup(Transform menuHolder)
         {
             if (window != null) Object.Destroy(window);
-            
+
             var windowDimensions = new Vector2Int(800, 534);
             window = CreateWindow(menuHolder, GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 156, -92, titleText: "");
             window.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter, 10);
@@ -41,6 +55,7 @@ namespace ModInstaller.GUI
                 fieldsChanged = false;
                 ModInfoPane.Regenerate(new ModData());
                 ModList.Regenerate();
+                UpdatePage(0, false);
             }, text: "Clear");
             CreateButton(confirmContainer, 125, 47, onClick: () =>
             {
@@ -48,7 +63,57 @@ namespace ModInstaller.GUI
                 fieldsChanged = false;
                 ModInfoPane.Regenerate(new ModData());
                 ModList.Regenerate(tagsQuery.Text, searchQuery.Text);
+                UpdatePage(0, false);
             }, text: "Search");
+
+            Container pagesContainer = CreateContainer(window);
+            pagesContainer.CreateLayoutGroup(Type.Horizontal, spacing: 3);
+            pageButtons.Add(CreateButton(pagesContainer, 50, 45, onClick: () => UpdatePage(-2), text: "<<"));
+            pageButtons.Add(CreateButton(pagesContainer, 40, 45, onClick: () => UpdatePage(-1), text: "<"));
+            pagesText = CreateLabel(pagesContainer, 200, 40, text: "Page 1 of 1");
+            pageButtons.Add(CreateButton(pagesContainer, 40, 45, onClick: () => UpdatePage(1), text: ">"));
+            pageButtons.Add(CreateButton(pagesContainer, 50, 45, onClick: () => UpdatePage(2), text: ">>"));
+            
+            UpdatePage(0, false);
+        }
+
+        public static void PageButtonsEnabled(bool enabled)
+        {
+            pageButtons.ForEach((button) =>
+            {
+                button.gameObject.GetComponent<ButtonPC>().SetEnabled(enabled);
+            });
+        }
+        private static async void UpdatePage(int pageModifier = 0, bool regenerate = true)
+        {
+            switch (pageModifier)
+            {
+                case 0:
+                    results = await Requests.GetModCount(tagsQuery.Text, searchQuery.Text);
+                    page = 1;
+                    totalPages = (int)Math.Clamp(Mathf.Ceil((float)results / InstallerMenu.maxModsPerPage), 1, int.MaxValue);
+                    break;
+                case 1 or -1:
+                    int newPage = page + pageModifier;
+                    if (newPage < 1 || newPage > totalPages) return;
+                    page = newPage;
+                    break;
+                case 2:
+                    if (page == totalPages) return;
+                    page = totalPages;
+                    break;
+                case -2:
+                    if (page == 1) return;
+                    page = 1;
+                    break;
+            }
+            
+            pagesText.Text = "Page " + page + " of " + totalPages;
+            
+            if (!regenerate) return;
+            ModInfoPane.Regenerate(new ModData());
+            ModList.Regenerate(tagsQuery.Text, searchQuery.Text, InstallerMenu.maxModsPerPage * (page - 1));
+            
         }
     }
 }
