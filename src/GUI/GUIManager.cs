@@ -1,38 +1,37 @@
-using SFS.UI.ModGUI;
 using SFS.UI;
+using SFS.UI.ModGUI;
 using UnityEngine;
 
-namespace ModInstaller
+namespace ModInstaller.GUI
 {
     public class InstallerMenu : BasicMenu
     {
         public static InstallerMenu main;
-        private GUI gui;
 
         private void Awake()
         {
             main = this;
             menuHolder = new GameObject("Installer Menu");
             menuHolder.SetActive(false);
-            gui = menuHolder.AddComponent<GUI>();
+            menuHolder.AddComponent<GUIManager>();
         }
 
         public override void OnOpen()
         {
             menuHolder.SetActive(true);
-            GUI.menuHolder.SetActive(true);
+            GUIManager.menuHolder.SetActive(true);
         }
         
         public override void OnClose()
         {
             menuHolder.SetActive(false);
-            GUI.menuHolder.SetActive(false);
+            GUIManager.menuHolder.SetActive(false);
         }
     }
     
     
     
-    public class GUI : MonoBehaviour
+    public class GUIManager : MonoBehaviour
     {
         public static GameObject menuHolder;
         
@@ -41,7 +40,7 @@ namespace ModInstaller
             menuHolder = Builder.CreateHolder(Builder.SceneToAttach.BaseScene, "");
             ModListPane.Setup(menuHolder.transform);
             ModInfoPane.Setup(menuHolder.transform);
-            RightBottomPane.Setup(menuHolder.transform);
+            SearchPane.Setup(menuHolder.transform);
         }
         
         // KEEP THIS HERE INDEFINETLY

@@ -8,34 +8,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace ModInstaller
+namespace ModInstaller.API
 {
-    [Serializable]
-    public class ModData
-    {
-        public string modID;
-        public string modName = "";
-        public string modDescription = "";
-        public string modAuthor = "";
-        public string modVersion = "";
-        public string modReleaseDate;
-        public string modTags;
-        public string modIcon;
-        public string github;
-        public string forum;
-        public string donation;
-    }
-
-    [Serializable]
-    public class ModVersionData
-    {
-        public int modVersionID;
-        public string modID;
-        public string versionNumber;
-        public string releaseDate;
-        public string changelog;
-    }
-
     public static class Requests 
 	{
         private static readonly string modFolderPath = Main.inst.ModFolder;
@@ -48,10 +22,10 @@ namespace ModInstaller
             {
                 results = JsonConvert.DeserializeObject<ModData[]>(json).ToList();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 results = null;
-                throw;
+                Debug.LogError(e);
             }
         }
 
@@ -76,25 +50,35 @@ namespace ModInstaller
         {
             var url = $"https://api.astromods.xyz{endpoint}";
             // Debug.Log(url);
+            string content = null;
+            
             using var client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = null;
+            
+            try { response = await client.GetAsync(url); }
+            catch (Exception e) { Debug.LogError(e); }
 
-            string content;
-            if (!response.IsSuccessStatusCode)
+
+            switch (response)
             {
-                if (response.StatusCode == HttpStatusCode.NotFound)
+                case { IsSuccessStatusCode: false }:
                 {
-                    content = "[]";
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        content = "[]";
+                    }
+                    else
+                    {
+                        Debug.LogError($"Failed to get data. Status code: {response.StatusCode}");
+                    }
+                    break;
                 }
-                else
-                {
-                    throw new Exception($"Failed to get data. Status code: {response.StatusCode}");
-                }
-
-                return content;
+                case null:
+                    return null;
+                default:
+                    content = await response.Content.ReadAsStringAsync();
+                    break;
             }
-
-            content = await response.Content.ReadAsStringAsync();
             return content;
         }
 

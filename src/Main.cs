@@ -1,4 +1,6 @@
 using HarmonyLib;
+using JetBrains.Annotations;
+using ModInstaller.GUI;
 using ModLoader;
 using ModLoader.Helpers;
 using SFS.Audio;
@@ -8,6 +10,7 @@ using UnityEngine;
 
 namespace ModInstaller
 {
+    [UsedImplicitly]
     public class Main : Mod
     {
 
@@ -25,10 +28,7 @@ namespace ModInstaller
 
         public static bool DisableModUpdates => true;
         
-        public override async void Load()
-        {
-            await Requests.ListMods(20, 0);
-        }
+        public override void Load() {}
         public override void Early_Load()
         {
             inst = this;
@@ -43,24 +43,20 @@ namespace ModInstaller
             GameObject installerButton = Object.Instantiate(GameObject.Find("Exit Button"), buttons, true);
             var buttonPC = installerButton.GetComponent<ButtonPC>();
             var textAdapter = installerButton.GetComponentInChildren<TextAdapter>();
+            textAdapter.Text = "Mod Installer";
             Object.Destroy(installerButton.GetComponent<TranslationSelector>());
             installerButton.name = "Mod Installer Button";
-            textAdapter.Text = "Mod Installer";// add text button
             
-            new GameObject("Mod Installer Menu Holder").AddComponent<InstallerMenu>();
             
-            //click events
+            installerButton.AddComponent<InstallerMenu>();
+            
             buttonPC.holdEvent = new HoldUnityEvent();
             buttonPC.clickEvent = new ClickUnityEvent();
-            buttonPC.clickEvent.AddListener(async delegate
+            buttonPC.clickEvent.AddListener(delegate
             {
                 SoundPlayer.main.clickSound.Play();
                 InstallerMenu.main.Open();
-                await Requests.VersionNumberToVersionID("UITools");
             });
-
-            // screen position
-            // buttonPC.transform.localScale = new Vector3(1,1,1);
         }
     }
 }

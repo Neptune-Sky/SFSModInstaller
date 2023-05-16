@@ -454,11 +454,16 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="src\GUI.cs" />
-        <Compile Include="src\GUIData.cs" />
+        <Compile Include="src\API\APIData.cs" />
+        <Compile Include="src\API\APIHandling.cs" />
+        <Compile Include="src\GUI\GUIManager.cs" />
+        <Compile Include="src\GUI\ModInfoPane.cs" />
+        <Compile Include="src\GUI\SearchPane.cs" />
         <Compile Include="src\InstallHandling.cs" />
         <Compile Include="src\Main.cs" />
-        <Compile Include="src\APIHandling.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="src\GUI\ModListPane.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
