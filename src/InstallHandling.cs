@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace ModInstaller
 {
     public class InstallHandling
@@ -8,17 +10,20 @@ namespace ModInstaller
             //Requests.VersionNumberToVersionID(modID, versionNumber);
             // Lets say you store it as versionID in this case
 
+            // Store Reqquest VersionID in a variable
+            string versionID = await VersionNumberToVersionID(modID, versionNumber);
+            Debug.Log(versionID);
             // Download mod
             //Requests.DownloadMod(versionID);
             // returns links and mod types lets say stored as dldata.links and dldata.types
-            
+
             // Download mod files
             // Create loop for each item in dldata
             //for (int i = 0; i < 1; i++)
             //{
-                //define path
+            //define path
 
-                // if (dldata.types[i] == "mod") path = "/", if (dldata.types[i] == "pack") path = "/Custom Assets/Packs", etc.
+            // if (dldata.types[i] == "mod") path = "/", if (dldata.types[i] == "pack") path = "/Custom Assets/Packs", etc.
 
             //    Requests.DownloadFile(dldata.links[i],path);
             //}
@@ -27,7 +32,7 @@ namespace ModInstaller
 
 
 
-            
+
         }
     }
 }
