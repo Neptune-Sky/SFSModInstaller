@@ -107,7 +107,7 @@ namespace ModInstaller.API
             var count = 0;
             try
             {
-                string content = await GetAsync(GenerateEndpoint(tags, query));
+                string content = await GetAsync("/total" + GenerateEndpoint(tags, query));
                 count = int.Parse(content);
             }
             catch (Exception) { /* ignore */ }
