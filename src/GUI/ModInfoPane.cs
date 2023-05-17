@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Linq;
 using ModInstaller.API;
+using ModLoader;
 using SFS.UI;
 using SFS.UI.ModGUI;
 using TMPro;
@@ -88,6 +90,25 @@ namespace ModInstaller.GUI
             {
                 forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
                 forumsButton.OnClick = () => Process.Start(modData.forum);
+            }
+
+            ModData mod = modData;
+            if (mod.modTags != null)
+            {
+                string[] modtags = mod.modTags.Split(',');
+                if (modtags.Contains("nodownload"))
+                {
+                    installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+                }
+                else
+                {
+                    installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
+                    installButton.OnClick = async () =>
+                    {
+                        await InstallHandling.InstallMod(mod.modID);
+                    };
+                    installButton.OnClick = () => UnityEngine.Debug.Log(mod.modID);
+                }
             }
 
             /*if (installed)
