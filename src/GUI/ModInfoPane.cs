@@ -91,11 +91,9 @@ namespace ModInstaller.GUI
                 forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
                 forumsButton.OnClick = () => Process.Start(modData.forum);
             }
-
-            ModData mod = modData;
-            if (mod.modTags != null)
+            if (modData.modTags != null)
             {
-                string[] modtags = mod.modTags.Split(',');
+                string[] modtags = modData.modTags.Split(',');
                 if (modtags.Contains("nodownload"))
                 {
                     installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
@@ -105,9 +103,9 @@ namespace ModInstaller.GUI
                     installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
                     installButton.OnClick = async () =>
                     {
-                        await InstallHandling.InstallMod(mod.modID);
+                        await InstallHandling.InstallMod(modData.modID);
                     };
-                    installButton.OnClick = () => UnityEngine.Debug.Log(mod.modID);
+                    installButton.OnClick = () => UnityEngine.Debug.Log(modData);
                 }
             }
 

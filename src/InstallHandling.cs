@@ -68,9 +68,9 @@ namespace ModInstaller
                             Requests.DownloadAndUnzipFile(fileURL, modFolderPath);
                             //Debug.Log("Zip file downloaded and extracted successfully.");
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-                            
+                            Debug.Log(ex);
                         }
                     }
 

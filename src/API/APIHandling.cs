@@ -53,7 +53,7 @@ namespace ModInstaller.API
         private static async Task<string> GetAsync(string endpoint)
         {
             var url = $"https://api.astromods.xyz{endpoint}";
-            // Debug.Log(url);
+            Debug.Log(url);
             string content = null;
             
             using var client = new HttpClient();
