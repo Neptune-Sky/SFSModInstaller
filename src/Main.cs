@@ -19,7 +19,7 @@ namespace ModInstaller
         public override string DisplayName => "Mod Installer";
         public override string Author => "0xNim & NeptuneSky";
         public override string MinimumGameVersionNecessary => "1.5.9.8";
-        public override string ModVersion => "Beta-0.6.0";
+        public override string ModVersion => "Beta-0.6.1";
         public override string Description => "Adds a new menu for use with 0xNim's Mod Installer API.";
 
         // This initializes the patcher. This is required if you use any Harmony patches.

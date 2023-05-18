@@ -57,10 +57,10 @@ namespace ModInstaller
 
                     // Download the mod using fileURL and fileType
                     // if file type = plugin,mod,pack,texture
-                    if (fileType == "plugin") Requests.DownloadFile(fileURL, modFolderPath + "Plugins" + fileName);
+                    if (fileType == "plugin") Requests.DownloadFile(fileURL, modFolderPath + "/LuaInterpreter/Plugins/" + fileName);
                     if (fileType == "mod") Requests.DownloadFile(fileURL, modFolderPath + "/" + fileName);
-                    if (fileType == "pack") Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Packs" + fileName);
-                    if (fileType == "texture") Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Textures" + fileName);
+                    if (fileType == "pack") Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Parts/" + fileName);
+                    if (fileType == "texture") Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Textures/" + fileName);
                     if (fileType == "mod-zip")
                     {
                         try
@@ -83,5 +83,7 @@ namespace ModInstaller
                 // ...
             }
         }
+
+
     }
 }
