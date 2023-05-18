@@ -73,6 +73,7 @@ namespace ModInstaller
                             Debug.Log(ex);
                         }
                     }
+                    Debug.Log(modFolderPath);
 
                 }
             }
