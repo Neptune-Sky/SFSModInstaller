@@ -7,6 +7,8 @@ using SFS.Audio;
 using SFS.IO;
 using SFS.Translations;
 using SFS.UI;
+using System.Collections.Generic;
+using UITools;
 using UnityEngine;
 
 namespace ModInstaller
@@ -14,23 +16,17 @@ namespace ModInstaller
     [UsedImplicitly]
     public class Main : Mod
     {
-
         public override string ModNameID => "0xNim.ModInstaller.Mod";
         public override string DisplayName => "Mod Installer";
-        public override string Author => "0xNim & NeptuneSky";
+        public override string Author => "NeptuneSky & 0xNim";
         public override string MinimumGameVersionNecessary => "1.5.9.8";
         public override string ModVersion => "Beta-0.6.1";
         public override string Description => "Adds a new menu for use with 0xNim's Mod Installer API.";
 
-        // This initializes the patcher. This is required if you use any Harmony patches.
         private static Harmony patcher;
-
         public static Main inst;
-
         public static bool DisableModUpdates => true;
-        
-        public override void Load() {}
-
+        public override void Load() { }
         public static FolderPath modFolder;
 
         public override void Early_Load()
@@ -41,8 +37,10 @@ namespace ModInstaller
             patcher.PatchAll();
 
             modFolder = new FolderPath(ModFolder);
+
+            // Additional initialization code
         }
-        
+
         private static void insertModsButton()
         {
             Transform buttons = GameObject.Find("Buttons").transform;
@@ -52,10 +50,9 @@ namespace ModInstaller
             textAdapter.Text = "Mod Installer";
             Object.Destroy(installerButton.GetComponent<TranslationSelector>());
             installerButton.name = "Mod Installer Button";
-            
-            
+
             installerButton.AddComponent<InstallerMenu>();
-            
+
             buttonPC.holdEvent = new HoldUnityEvent();
             buttonPC.clickEvent = new ClickUnityEvent();
             buttonPC.clickEvent.AddListener(delegate
@@ -64,6 +61,33 @@ namespace ModInstaller
                 InstallerMenu.main.Open();
             });
         }
-                "https://github.com/Neptune-Sky/SFSModInstaller/releases/latest/download/UITools.dll",
+
+        // Check if UITools mod is present and conditionally implement IUpdatable interface
+    }
+
+    public class UpdaterMod : Mod, IUpdatable
+    {
+        public override string ModNameID => "0xNim.ModInstaller.Updater";
+        public override string DisplayName => "ModInstaller Updater";
+        public override string Author => "0xNim";
+        public override string MinimumGameVersionNecessary => "1.0";
+        public override string ModVersion => "0";
+        public override string Description => "Handles self updating functionality for ModInstaller.";
+
+        public Dictionary<string, FilePath> UpdatableFiles => new()
+        {
+            {
+                "https://github.com/Neptune-Sky/SFSModInstaller/releases/latest/download/ModInstaller.dll",
+                new FolderPath(ModFolder).ExtendToFile("ModInstaller.dll")
+            }
+            // Add more update file entries as needed
+        };
+
+
+
+        public override void Load()
+        {
+            // Perform any additional initialization or setup for the updater mod
+        }
     }
 }

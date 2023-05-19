@@ -133,6 +133,9 @@
     <Reference Include="System.Xml.Linq">
       <HintPath>References\System.Xml.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="UITools">
+      <HintPath>References\UITools.dll</HintPath>
+    </Reference>
     <Reference Include="UniTask">
       <HintPath>References\UniTask.dll</HintPath>
     </Reference>
