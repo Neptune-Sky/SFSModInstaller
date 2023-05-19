@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Linq;
 using ModInstaller.API;
 using ModLoader;
+using SFS.Input;
 using SFS.UI;
 using SFS.UI.ModGUI;
 using TMPro;
@@ -63,12 +64,9 @@ namespace ModInstaller.GUI
             forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             installButton = CreateButton(buttons, 228, 60, text: "Install");
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-
-           
-            
         }
 
-        public static void Regenerate(ModData modData)
+        public static async void Regenerate(ModData modData)
         {
             name.Text = modData.modName;
             version.Text = modData.modVersion;
@@ -94,20 +92,21 @@ namespace ModInstaller.GUI
                 forumsButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
                 forumsButton.OnClick = () => Process.Start(modData.forum);
             }
-
-            if (false)
+            
+            installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+            bool downloadable = await Requests.CheckInstallable(modData.modID);
+            if (!downloadable) return;
+            
+            installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
+            installButton.OnClick = async () =>
             {
-                installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            }
-            else
-            {
-                installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
-                installButton.OnClick = async () =>
-                {
-                    await InstallHandling.InstallMod(modData.modID);
-                    //UnityEngine.Debug.Log(modData);
-                };
-            }
+                await InstallHandling.InstallMod(modData.modID);
+                MenuGenerator.OpenConfirmation(CloseMode.None,
+                    () => "Mods have been installed, would you like to restart now to activate them?",
+                    () => "Yes", ApplicationUtility.Relaunch,
+                    () => "No", ScreenManager.main.CloseCurrent
+                );
+            };
 
             /*if (installed)
             {

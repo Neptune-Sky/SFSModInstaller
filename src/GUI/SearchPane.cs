@@ -79,7 +79,7 @@ namespace ModInstaller.GUI
 
         public static void PageButtonsEnabled(bool enabled)
         {
-            pageButtons.ForEach((button) =>
+            pageButtons.ForEach(button =>
             {
                 button.gameObject.GetComponent<ButtonPC>().SetEnabled(enabled);
             });

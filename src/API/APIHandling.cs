@@ -1,8 +1,7 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -95,7 +94,7 @@ namespace ModInstaller.API
         public static void DownloadAndUnzipFile(string url, string destinationFolderPath)
         {
             using var client = new WebClient();
-            string tempZipFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".zip");
+            string tempZipFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".zip");
             client.DownloadFile(url, tempZipFilePath);
             ZipFile.ExtractToDirectory(tempZipFilePath, destinationFolderPath);
             File.Delete(tempZipFilePath);
@@ -171,25 +170,9 @@ namespace ModInstaller.API
             var endpoint = $"/version/alternative/{modID}/{versionNumber}";
             string json = await GetAsync(endpoint);
 
-            try
-            {
-                var versionData = JsonConvert.DeserializeObject<ModVersionData>(json);
-                if (versionData != null)
-                {
-                    return versionData.modVersionID;
-                }
-                else
-                {
-                    // Handle the case where versionData is null (error occurred)
-                    // ...
-                }
-            }
-            catch (Exception)
-            {
-                // Handle the exception
-                throw;
-            }
-
+            var versionData = JsonConvert.DeserializeObject<ModVersionData>(json);
+            if (versionData != null)
+                return versionData.modVersionID;
             return -1; // Default return value if modVersionID is not found
         }
 
@@ -198,54 +181,29 @@ namespace ModInstaller.API
             var endpoint = $"/download/{modVersionID}";
             string content = await GetAsync(endpoint);
 
-            try
-            {
-                var downloadDataList = JsonConvert.DeserializeObject<List<DownloadData>>(content);
-                if (downloadDataList != null && downloadDataList.Count > 0)
-                {
-                    List<(string, string)> downloadLinks = downloadDataList
-                        .Select(downloadData => (downloadData.fileURL, downloadData.fileType))
-                        .ToList();
+            var downloadDataList = JsonConvert.DeserializeObject<List<DownloadData>>(content);
+            if (downloadDataList is not { Count: > 0 }) return new List<(string, string)>(); // Default return value if downloadDataList is not found
+            
+            List<(string, string)> downloadLinks = downloadDataList
+                .Select(downloadData => (downloadData.fileURL, downloadData.fileType))
+                .ToList();
 
-                    return downloadLinks;
-                }
-                else
-                {
-                    // Handle the case where downloadDataList is null or empty (no download links found)
-                    // ...
-                }
-            }
-            catch (Exception)
-            {
-                // Handle the exception
-                throw;
-            }
-
-            return new List<(string, string)>(); // Default return value if downloadDataList is not found
+            return downloadLinks;
         }
 
-        public static bool CheckInstallable(string modID)
+        public static async Task<bool> CheckInstallable(string modID)
         {
-            try
-            {
                 var endpoint = $"/installable/{modID}";
-                string content = GetAsync(endpoint).Result;
+                string content = await GetAsync(endpoint);
 
                 if (bool.TryParse(content, out bool installable))
                 {
                     return installable;
                 }
-                else
-                {
-                    // Handle the case when the content is not a valid boolean value
-                    throw new InvalidOperationException("Invalid installable value returned.");
-                }
-            }
-            catch (Exception)
-            {
-                // Handle any exceptions that occurred during the request or parsing
-                throw;
-            }
+
+                // Handle the case when the content is not a valid boolean value
+                throw new InvalidOperationException("Invalid installable value returned.");
+            
         }
     }
 }
