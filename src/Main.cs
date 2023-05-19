@@ -8,25 +8,39 @@ using SFS.IO;
 using SFS.Translations;
 using SFS.UI;
 using System.Collections.Generic;
-using UITools;
+using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 
 namespace ModInstaller
 {
     [UsedImplicitly]
-    public class Main : Mod
+    public class Main : Mod, IUpdatable
     {
         public override string ModNameID => "0xNim.ModInstaller.Mod";
         public override string DisplayName => "Mod Installer";
         public override string Author => "NeptuneSky & 0xNim";
         public override string MinimumGameVersionNecessary => "1.5.9.8";
-        public override string ModVersion => "Beta-0.6.1";
+        public override string ModVersion => "Beta-0.6.2";
         public override string Description => "Adds a new menu for use with 0xNim's Mod Installer API.";
+
+
+        public Dictionary<string, FilePath> UpdatableFiles => new()
+        {
+            {
+                "https://github.com/Neptune-Sky/SFSModInstaller/releases/latest/download/ModInstaller.dll",
+                new FolderPath(ModFolder).ExtendToFile("ModInstaller.dll")
+            }
+        };
 
         private static Harmony patcher;
         public static Main inst;
         public static bool DisableModUpdates => true;
-        public override void Load() { }
+        public override async void Load()
+        {
+            IUpdatable modToUpdate = new Main(); // Replace MyMod with the actual class implementing IUpdatable
+            await ModsUpdater.Update(modToUpdate);
+        }
+
         public static FolderPath modFolder;
 
         public override void Early_Load()
@@ -60,34 +74,6 @@ namespace ModInstaller
                 SoundPlayer.main.clickSound.Play();
                 InstallerMenu.main.Open();
             });
-        }
-
-        // Check if UITools mod is present and conditionally implement IUpdatable interface
-    }
-
-    public class UpdaterMod : Mod, IUpdatable
-    {
-        public override string ModNameID => "0xNim.ModInstaller.Updater";
-        public override string DisplayName => "ModInstaller Updater";
-        public override string Author => "0xNim";
-        public override string MinimumGameVersionNecessary => "1.0";
-        public override string ModVersion => "0";
-        public override string Description => "Handles self updating functionality for ModInstaller.";
-
-        public Dictionary<string, FilePath> UpdatableFiles => new()
-        {
-            {
-                "https://github.com/Neptune-Sky/SFSModInstaller/releases/latest/download/ModInstaller.dll",
-                new FolderPath(ModFolder).ExtendToFile("ModInstaller.dll")
-            }
-            // Add more update file entries as needed
-        };
-
-
-
-        public override void Load()
-        {
-            // Perform any additional initialization or setup for the updater mod
         }
     }
 }

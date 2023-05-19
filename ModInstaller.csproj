@@ -461,6 +461,7 @@
     <Compile Include="src\GUI\ModInfoPane.cs" />
     <Compile Include="src\GUI\SearchPane.cs" />
     <Compile Include="src\InstallHandling.cs" />
+    <Compile Include="src\ModUpdater.cs" />
     <Compile Include="src\Main.cs" />
   </ItemGroup>
   <ItemGroup>
