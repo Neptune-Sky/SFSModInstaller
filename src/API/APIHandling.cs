@@ -196,14 +196,7 @@ namespace ModInstaller.API
                 var endpoint = $"/installable/{modID}";
                 string content = await GetAsync(endpoint);
 
-                if (bool.TryParse(content, out bool installable))
-                {
-                    return installable;
-                }
-
-                // Handle the case when the content is not a valid boolean value
-                throw new InvalidOperationException("Invalid installable value returned.");
-            
+                return bool.TryParse(content, out bool installable) && installable;
         }
     }
 }
