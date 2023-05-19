@@ -64,5 +64,6 @@ namespace ModInstaller
                 InstallerMenu.main.Open();
             });
         }
+                "https://github.com/Neptune-Sky/SFSModInstaller/releases/latest/download/UITools.dll",
     }
 }
