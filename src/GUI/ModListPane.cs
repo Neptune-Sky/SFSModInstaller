@@ -76,18 +76,15 @@ namespace ModInstaller.GUI
             SearchPane.PageButtonsEnabled(false);
             await Requests.PullMods(searchTags, searchQuery, offset);
             loading.gameObject.SetActive(false);
-            
-            
-            if (Requests.results == null)
-            {
-                error.gameObject.SetActive(true);
-                return;
-            }
 
-            if (Requests.results.Count == 0)
+            switch (Requests.results)
             {
-                noResults.gameObject.SetActive(true);
-                return;
+                case null:
+                    error.gameObject.SetActive(true);
+                    return;
+                case { Count: 0 }:
+                    noResults.gameObject.SetActive(true);
+                    return;
             }
             SearchPane.PageButtonsEnabled(true);
             
