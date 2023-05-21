@@ -55,7 +55,7 @@ namespace ModInstaller.GUI
             noResults.gameObject.SetActive(false);
             error.gameObject.SetActive(false);
 
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < InstallerMenu.maxModsPerPage; i++)
             {
                 Button button = CreateButton(window, 1075, 140);
                 button.gameObject.SetActive(false);
