@@ -4,36 +4,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using System;
-
+using System.IO;
+using System.Net;
+using System.Text.RegularExpressions;
+using SFS.IO;
+using System.IO.Compression;
 
 namespace ModInstaller
 {
-    public class InstallHandling
+    public static class InstallHandling
     {
-        // Convert modID and versionNumber to versionID
-        //Requests.VersionNumberToVersionID(modID, versionNumber);
-        // Lets say you store it as versionID in this case
-
-        // Store Reqquest VersionID in a variable
-
-        // Download mod
-        //Requests.DownloadMod(versionID);
-        // returns links and mod types lets say stored as dldata.links and dldata.types
-
-        // Download mod files
-        // Create loop for each item in dldata
-        //for (int i = 0; i < 1; i++)
-        //{
-        //define path
-
-        // if (dldata.types[i] == "mod") path = "/", if (dldata.types[i] == "pack") path = "/Custom Assets/Packs", etc.
-
-        //    Requests.DownloadFile(dldata.links[i],path);
-        //}
-
-        //Debug.Log("Mod installed");
-
-
+        public static readonly List<string> modsAwaitingInstall = new();
         public static async Task InstallMod(string modID, string versionNumber = "latest")
         {
             int versionID = await Requests.VersionNumberToVersionID(modID, versionNumber);
@@ -44,7 +25,7 @@ namespace ModInstaller
                 // ... Theoretical from now on. As I don't know how
 
                 List<(string fileURL, string fileType)> downloadLinks = await Requests.GetDownloadLinks(versionID);
-
+                modsAwaitingInstall.Add(modID);
                 foreach ((string fileURL, string fileType) in downloadLinks)
                 {
                     string fileName = fileURL[(fileURL.LastIndexOf('/') + 1)..];
@@ -57,21 +38,21 @@ namespace ModInstaller
                         // Download the mod using fileURL and fileType
                         // if file type = plugin,mod,pack,texture
                         case "plugin":
-                            Requests.DownloadFile(fileURL, modFolderPath + "Plugins" + fileName);
+                            DownloadFile(fileURL, modFolderPath + "Plugins" + fileName);
                             break;
                         case "mod":
-                            Requests.DownloadFile(fileURL, modFolderPath + "/" + fileName);
+                            DownloadFile(fileURL, new FolderPath(modFolderPath + "/" + Regex.Replace(fileName,".dll$", "")).ExtendToFile(fileName));
                             break;
                         case "pack":
-                            Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Packs" + fileName);
+                            DownloadFile(fileURL, modFolderPath + "/Custom Assets/Parts/" + fileName);
                             break;
                         case "texture":
-                            Requests.DownloadFile(fileURL, modFolderPath + "/Custom Assets/Textures" + fileName);
+                            DownloadFile(fileURL, modFolderPath + "/Custom Assets/Texture Packs/" + fileName);
                             break;
                         case "mod-zip":
                             try
                             {
-                                Requests.DownloadAndUnzipFile(fileURL, modFolderPath);
+                                DownloadAndUnzipFile(fileURL, modFolderPath);
                                 //Debug.Log("Zip file downloaded and extracted successfully.");
                             }
                             catch (Exception ex)
@@ -82,7 +63,26 @@ namespace ModInstaller
                             break;
                     }
                 }
+
+                modsAwaitingInstall.Remove(modID);
             }
+        }
+        private static async void DownloadFile(string url, string destinationFilePath)
+        {
+            using var client = new WebClient();
+            await Task.Run(() => client.DownloadFile(url, destinationFilePath));
+        }
+
+        private static async void DownloadAndUnzipFile(string url, string destinationFolderPath)
+        {
+            using var client = new WebClient();
+            string tempZipFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".zip");
+            await Task.Run(() =>
+            {
+                client.DownloadFile(url, tempZipFilePath);
+                ZipFile.ExtractToDirectory(tempZipFilePath, destinationFolderPath);
+                File.Delete(tempZipFilePath);
+            });
         }
     }
 }

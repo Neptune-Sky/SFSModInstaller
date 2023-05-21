@@ -9,8 +9,6 @@ using ModInstaller.GUI;
 using Newtonsoft.Json;
 using UnityEngine;
 
-using System.IO.Compression;
-
 namespace ModInstaller.API
 {
     public static class Requests 
@@ -85,21 +83,6 @@ namespace ModInstaller.API
             return content;
         }
 
-        public static void DownloadFile(string url, string destinationFilePath)
-        {
-            using var client = new WebClient();
-            client.DownloadFile(url, destinationFilePath);
-        }
-
-        public static void DownloadAndUnzipFile(string url, string destinationFolderPath)
-        {
-            using var client = new WebClient();
-            string tempZipFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".zip");
-            client.DownloadFile(url, tempZipFilePath);
-            ZipFile.ExtractToDirectory(tempZipFilePath, destinationFolderPath);
-            File.Delete(tempZipFilePath);
-        }
-            
         public static void DeleteFolder(string folderPath)
         {
             Directory.Delete(folderPath, true);
