@@ -11,39 +11,36 @@ using System;
 
 namespace ModInstaller
 {
-
-    static class ModsUpdater
+    internal static class ModsUpdater
     {
-        static readonly HttpClient Http = new();
-        static readonly MD5 MD5 = MD5.Create();
-        static int loadedFiles;
+        private static readonly HttpClient Http = new();
+        private static readonly MD5 MD5 = MD5.Create();
+        private static int loadedFiles;
 
         public static async UniTask Update(IUpdatable mod)
         {
-            foreach (KeyValuePair<string, FilePath> file in mod.UpdatableFiles)
+            foreach ((string fileKey, FilePath filePath) in mod.UpdatableFiles)
             {
-                HttpRequestMessage request = new(HttpMethod.Head, file.Key);
+                HttpRequestMessage request = new(HttpMethod.Head, fileKey);
                 HttpResponseMessage response = await Http.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
                     continue;
 
                 byte[] md5HashLocal =
-                    file.Value.FileExists() ? MD5.ComputeHash(file.Value.ReadBytes()) : Array.Empty<byte>();
+                    filePath.FileExists() ? MD5.ComputeHash(filePath.ReadBytes()) : Array.Empty<byte>();
                 byte[] md5HashRemote = response.Content.Headers.ContentMD5;
 
                 if (md5HashLocal.SequenceEqual(md5HashRemote))
                     continue;
 
-                request = new HttpRequestMessage(HttpMethod.Get, file.Key);
+                request = new HttpRequestMessage(HttpMethod.Get, fileKey);
                 response = await Http.SendAsync(request);
 
                 byte[] data = await response.Content.ReadAsByteArrayAsync();
-                if (data != null)
-                {
-                    file.Value.WriteBytes(data);
-                    loadedFiles += 1;
-                }
+                if (data == null) continue;
+                filePath.WriteBytes(data);
+                loadedFiles += 1;
             }
         }
 
