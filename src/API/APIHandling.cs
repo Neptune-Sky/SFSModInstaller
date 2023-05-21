@@ -190,13 +190,15 @@ namespace ModInstaller.API
 
             return downloadLinks;
         }
-
+        /* Better solution being worked on
+         
         public static async Task<bool> CheckInstallable(string modID)
         {
-                var endpoint = $"/installable/{modID}";
-                string content = await GetAsync(endpoint);
+            var endpoint = $"/installable/{modID}";
+            string content = await GetAsync(endpoint);
 
-                return bool.TryParse(content, out bool installable) && installable;
+            return bool.TryParse(content, out bool installable) && installable;
         }
+        */
     }
 }

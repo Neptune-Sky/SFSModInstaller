@@ -66,7 +66,7 @@ namespace ModInstaller.GUI
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
         }
 
-        public static async void Regenerate(ModData modData)
+        public static void Regenerate(ModData modData)
         {
             name.Text = modData.modName;
             version.Text = modData.modVersion;
@@ -94,7 +94,8 @@ namespace ModInstaller.GUI
             }
             
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-            bool downloadable = await Requests.CheckInstallable(modData.modID);
+            // bool downloadable = await Requests.CheckInstallable(modData.modID);
+            bool downloadable = !modData.modTags.Contains("nodownload");
             if (!downloadable) return;
             
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
