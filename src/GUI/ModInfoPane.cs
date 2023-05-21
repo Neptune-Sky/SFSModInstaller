@@ -19,6 +19,7 @@ namespace ModInstaller.GUI
         private static Label version;
         private static Label description;
         private static Label author;
+        private static Label tags;
 
         private static Button gitButton;
         private static Button forumsButton;
@@ -48,6 +49,12 @@ namespace ModInstaller.GUI
             author = CreateLabel(authorContainer, windowDimensions.x - 140, 40, text: "");
             author.TextAlignment = TextAlignmentOptions.Left;
             
+            Container tagsContainer = CreateContainer(window);
+            tagsContainer.CreateLayoutGroup(Type.Horizontal, TextAnchor.MiddleCenter, 10);
+            CreateLabel(tagsContainer, 95, 40, text: "Tags:").TextAlignment = TextAlignmentOptions.Left;
+            tags = CreateLabel(tagsContainer, windowDimensions.x - 140, 40, text: "None");
+            tags.TextAlignment = TextAlignmentOptions.Left;
+            
             CreateLabel(window, windowDimensions.x - 30, 40, text: "Description:").TextAlignment = TextAlignmentOptions.Left;
             Box box = CreateBox(window, 780, 290);
             box.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperLeft, 0, new RectOffset(10, 5, 20, 5));
@@ -72,7 +79,8 @@ namespace ModInstaller.GUI
             version.Text = modData.modVersion;
             author.Text = modData.modAuthor;
             description.Text = modData.modDescription;
-
+            tags.Text = "None";
+            
             if (modData.github == null)
             {
                 gitButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
@@ -95,8 +103,13 @@ namespace ModInstaller.GUI
             
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             // bool downloadable = await Requests.CheckInstallable(modData.modID);
-            bool downloadable = !modData.modTags.Contains("nodownload");
-            if (!downloadable) return;
+            if (modData.modTags != null)
+            {
+                string[] modTags = modData.modTags.Split(',');
+                if (modTags.Contains("nodownload")) return;
+                tags.Text = string.Join(", ", modTags);
+            }
+
             
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
             installButton.OnClick = async () =>
