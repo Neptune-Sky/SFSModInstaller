@@ -8,7 +8,6 @@ using SFS.IO;
 using SFS.Translations;
 using SFS.UI;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 
 namespace ModInstaller
@@ -58,7 +57,9 @@ namespace ModInstaller
         private static void insertModsButton()
         {
             Transform buttons = GameObject.Find("Buttons").transform;
-            GameObject installerButton = Object.Instantiate(GameObject.Find("Exit Button"), buttons, true);
+            GameObject modLoaderButton = GameObject.Find("Mod Loader Button");
+            GameObject installerButton = Object.Instantiate(modLoaderButton, buttons, true);
+            installerButton.GetComponent<RectTransform>().SetSiblingIndex(modLoaderButton.GetComponent<RectTransform>().GetSiblingIndex() + 1);
             var buttonPC = installerButton.GetComponent<ButtonPC>();
             var textAdapter = installerButton.GetComponentInChildren<TextAdapter>();
             textAdapter.Text = "Mod Installer";
