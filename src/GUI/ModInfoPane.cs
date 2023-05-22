@@ -1,7 +1,7 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using ModInstaller.API;
-using ModLoader;
 using SFS.Input;
 using SFS.UI;
 using SFS.UI.ModGUI;
@@ -9,6 +9,9 @@ using TMPro;
 using UnityEngine;
 using static SFS.UI.ModGUI.Builder;
 using Button = SFS.UI.ModGUI.Button;
+using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
+using Type = SFS.UI.ModGUI.Type;
 
 namespace ModInstaller.GUI
 {
@@ -25,6 +28,7 @@ namespace ModInstaller.GUI
         private static Button forumsButton;
         private static Button installButton;
 
+        private static ModData currentMod;
 
         public static void Setup(Transform menuHolder)
         {   
@@ -75,6 +79,7 @@ namespace ModInstaller.GUI
 
         public static void Regenerate(ModData modData)
         {
+            currentMod = modData;
             name.Text = modData.modName;
             version.Text = modData.modVersion;
             author.Text = modData.modAuthor;
@@ -103,24 +108,23 @@ namespace ModInstaller.GUI
             
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             // bool downloadable = await Requests.CheckInstallable(modData.modID);
+            var nodownload = false;
             if (modData.modTags != null)
             {
-                string[] modTags = modData.modTags.Split(',');
-                if (modTags.Contains("nodownload")) return;
+                var modTags = modData.modTags.Split(',').ToList();
+                if (modTags.Contains("nodownload"))
+                {
+                    modTags.Remove("nodownload");
+                    nodownload = true;
+                }
                 tags.Text = string.Join(", ", modTags);
             }
 
+            if (nodownload || InstallHandling.modsAwaitingInstall.Contains(modData.modID)) return;
+
             
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
-            installButton.OnClick = async () =>
-            {
-                await InstallHandling.InstallMod(modData.modID);
-                MenuGenerator.OpenConfirmation(CloseMode.None,
-                    () => "Mods have been installed, would you like to restart now to activate them?",
-                    () => "Yes", ApplicationUtility.Relaunch,
-                    () => "No", ScreenManager.main.CloseCurrent
-                );
-            };
+            installButton.OnClick = () => InstallHandling.InstallButtonFunc(modData);
 
             /*if (installed)
             {
@@ -130,6 +134,16 @@ namespace ModInstaller.GUI
             {
                 installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             } */
+        }
+
+        public static void CheckInstallButton(string modID)
+        {
+            if (InstallHandling.modsAwaitingInstall.Contains(modID))
+            {
+                installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
+                return;
+            }
+            installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
         }
     }
 }

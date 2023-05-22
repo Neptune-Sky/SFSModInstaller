@@ -1,3 +1,4 @@
+using SFS.Input;
 using SFS.UI;
 using SFS.UI.ModGUI;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace ModInstaller.GUI
     {
         public static InstallerMenu main;
         public const int maxModsPerPage = 20;
-
+        public static bool modsInstalled = false;
         private void Awake()
         {
             main = this;
@@ -25,6 +26,11 @@ namespace ModInstaller.GUI
         
         public override void OnClose()
         {
+            if (modsInstalled)
+            {
+                ApplicationUtility.Relaunch();
+                return;
+            }
             menuHolder.SetActive(false);
             GUIManager.menuHolder.SetActive(false);
         }
