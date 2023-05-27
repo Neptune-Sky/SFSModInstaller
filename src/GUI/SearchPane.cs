@@ -19,6 +19,7 @@ namespace ModInstaller.GUI
         private static TextInput tagsQuery;
 
         private static Label pagesText;
+        private static Label modsNumberText;
         private static readonly List<Button> pageButtons = new();
 
         private static bool fieldsChanged;
@@ -34,20 +35,20 @@ namespace ModInstaller.GUI
             var windowDimensions = new Vector2Int(800, 534);
             window = CreateWindow(menuHolder, GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 156, -92, titleText: "");
             window.CreateLayoutGroup(Type.Vertical, TextAnchor.MiddleCenter, 10);
-
+            CreateSpace(window, 0, 0);
             Container searchContainer = CreateContainer(window);
             searchContainer.CreateLayoutGroup(Type.Vertical, spacing: 2);
-            CreateLabel(searchContainer, 450, 45, text: "Search by Title:");
-            searchQuery = CreateTextInput(searchContainer, 450, 50, onChange: _ => fieldsChanged = true, text: "");
+            CreateLabel(searchContainer, 500, 55, text: "Search by Title:");
+            searchQuery = CreateTextInput(searchContainer, 500, 60, onChange: _ => fieldsChanged = true, text: "");
 
             Container tagContainer = CreateContainer(window);
             tagContainer.CreateLayoutGroup(Type.Vertical, spacing: 2);
-            CreateLabel(tagContainer, 450, 45, text: "Search by Tag (Separate Tags with Commas):");
-            tagsQuery = CreateTextInput(tagContainer, 450, 50, onChange: _ => fieldsChanged = true, text: "");
+            CreateLabel(tagContainer, 500, 55, text: "Search by Tag (Separate Tags with Commas):");
+            tagsQuery = CreateTextInput(tagContainer, 500, 60, onChange: _ => fieldsChanged = true, text: "");
 
             Container confirmContainer = CreateContainer(window);
             confirmContainer.CreateLayoutGroup(Type.Horizontal, spacing: 3);
-            CreateButton(confirmContainer, 125, 47, onClick: () =>
+            CreateButton(confirmContainer, 160, 57, onClick: () =>
             {
                 if (!fieldsChanged && searchQuery.Text == "" && tagsQuery.Text == "") return;
                 searchQuery.Text = "";
@@ -57,7 +58,7 @@ namespace ModInstaller.GUI
                 ModList.Regenerate();
                 UpdatePage(0, false);
             }, text: "Clear");
-            CreateButton(confirmContainer, 125, 47, onClick: () =>
+            CreateButton(confirmContainer, 160, 57, onClick: () =>
             {
                 if (!fieldsChanged) return;
                 fieldsChanged = false;
@@ -68,11 +69,13 @@ namespace ModInstaller.GUI
 
             Container pagesContainer = CreateContainer(window);
             pagesContainer.CreateLayoutGroup(Type.Horizontal, spacing: 3);
-            pageButtons.Add(CreateButton(pagesContainer, 50, 45, onClick: () => UpdatePage(-2), text: "<<"));
-            pageButtons.Add(CreateButton(pagesContainer, 40, 45, onClick: () => UpdatePage(-1), text: "<"));
-            pagesText = CreateLabel(pagesContainer, 200, 40, text: "Page 1 of 1");
-            pageButtons.Add(CreateButton(pagesContainer, 40, 45, onClick: () => UpdatePage(1), text: ">"));
-            pageButtons.Add(CreateButton(pagesContainer, 50, 45, onClick: () => UpdatePage(2), text: ">>"));
+            pageButtons.Add(CreateButton(pagesContainer, 60, 55, onClick: () => UpdatePage(-2), text: "<<"));
+            pageButtons.Add(CreateButton(pagesContainer, 50, 55, onClick: () => UpdatePage(-1), text: "<"));
+            pagesText = CreateLabel(pagesContainer, 300, 50, text: "Page 1 of 1");
+            pageButtons.Add(CreateButton(pagesContainer, 50, 55, onClick: () => UpdatePage(1), text: ">"));
+            pageButtons.Add(CreateButton(pagesContainer, 60, 55, onClick: () => UpdatePage(2), text: ">>"));
+
+            modsNumberText = CreateLabel(window, 400, 35, text: "Displaying 1-20 of 20");
             PageButtonsEnabled(false);
             
             UpdatePage(0, false);
@@ -110,6 +113,9 @@ namespace ModInstaller.GUI
             }
             
             pagesText.Text = "Page " + page + " of " + totalPages;
+            modsNumberText.Text = results > 0
+                ? $"Displaying {(page - 1) * InstallerMenu.maxModsPerPage + 1} - {Math.Min(page * InstallerMenu.maxModsPerPage, results)} of {results}"
+                : "";
             
             if (!regenerate) return;
             ModInfoPane.Regenerate(new ModData());
