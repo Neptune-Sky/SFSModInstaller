@@ -60,9 +60,9 @@ namespace ModInstaller.GUI
             tags.TextAlignment = TextAlignmentOptions.Left;
             
             CreateLabel(window, windowDimensions.x - 30, 40, text: "Description:").TextAlignment = TextAlignmentOptions.Left;
-            Box box = CreateBox(window, 780, 310);
+            Box box = CreateBox(window, 780, 330);
             box.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperLeft, 0, new RectOffset(10, 5, 20, 5));
-            description = CreateLabel(box, 765, 290);
+            description = CreateLabel(box, 765, 310);
             description.TextAlignment = TextAlignmentOptions.TopLeft;
             description.gameObject.GetComponent<TextMeshProUGUI>().fontSizeMax = 30;
 

@@ -33,7 +33,7 @@ namespace ModInstaller.GUI
 
             var windowDimensions = new Vector2Int(800, 534);
             window = CreateWindow(menuHolder, GetRandomID(), windowDimensions.x, windowDimensions.y, windowDimensions.x / 2 + 156, -92, titleText: "");
-            window.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter, 10);
+            window.CreateLayoutGroup(Type.Vertical, TextAnchor.MiddleCenter, 10);
 
             Container searchContainer = CreateContainer(window);
             searchContainer.CreateLayoutGroup(Type.Vertical, spacing: 2);
@@ -93,7 +93,6 @@ namespace ModInstaller.GUI
                     results = await Requests.GetModCount(tagsQuery.Text, searchQuery.Text);
                     page = 1;
                     totalPages = (int)Math.Clamp(Mathf.Ceil((float)results / InstallerMenu.maxModsPerPage), 1, int.MaxValue);
-                    PageButtonsEnabled(totalPages != 1);
                     break;
                 case 1 or -1:
                     int newPage = page + pageModifier;
