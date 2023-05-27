@@ -19,7 +19,7 @@ namespace ModInstaller
         public override string DisplayName => "Mod Installer";
         public override string Author => "NeptuneSky & 0xNim";
         public override string MinimumGameVersionNecessary => "1.5.9.8";
-        public override string ModVersion => "Beta-0.6.2";
+        public override string ModVersion => "v0.1.0-alpha";
         public override string Description => "Adds a new menu for use with 0xNim's Mod Installer API.";
 
 
