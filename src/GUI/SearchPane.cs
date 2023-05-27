@@ -73,6 +73,7 @@ namespace ModInstaller.GUI
             pagesText = CreateLabel(pagesContainer, 200, 40, text: "Page 1 of 1");
             pageButtons.Add(CreateButton(pagesContainer, 40, 45, onClick: () => UpdatePage(1), text: ">"));
             pageButtons.Add(CreateButton(pagesContainer, 50, 45, onClick: () => UpdatePage(2), text: ">>"));
+            PageButtonsEnabled(false);
             
             UpdatePage(0, false);
         }
@@ -92,6 +93,7 @@ namespace ModInstaller.GUI
                     results = await Requests.GetModCount(tagsQuery.Text, searchQuery.Text);
                     page = 1;
                     totalPages = (int)Math.Clamp(Mathf.Ceil((float)results / InstallerMenu.maxModsPerPage), 1, int.MaxValue);
+                    PageButtonsEnabled(totalPages != 1);
                     break;
                 case 1 or -1:
                     int newPage = page + pageModifier;

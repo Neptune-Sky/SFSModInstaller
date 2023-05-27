@@ -60,12 +60,11 @@ namespace ModInstaller.GUI
             tags.TextAlignment = TextAlignmentOptions.Left;
             
             CreateLabel(window, windowDimensions.x - 30, 40, text: "Description:").TextAlignment = TextAlignmentOptions.Left;
-            Box box = CreateBox(window, 780, 290);
+            Box box = CreateBox(window, 780, 310);
             box.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperLeft, 0, new RectOffset(10, 5, 20, 5));
-            description = CreateLabel(box, 765, 270);
+            description = CreateLabel(box, 765, 290);
             description.TextAlignment = TextAlignmentOptions.TopLeft;
-            description.AutoFontResize = false;
-            description.FontSize = 30;
+            description.gameObject.GetComponent<TextMeshProUGUI>().fontSizeMax = 30;
 
             Container buttons = CreateContainer(window);
             buttons.CreateLayoutGroup(Type.Horizontal, spacing: 8f);
@@ -138,12 +137,7 @@ namespace ModInstaller.GUI
 
         public static void CheckInstallButton(string modID)
         {
-            if (InstallHandling.modsAwaitingInstall.Contains(modID))
-            {
-                installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
-                return;
-            }
-            installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);
+            installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(!InstallHandling.modsAwaitingInstall.Contains(modID));
         }
     }
 }

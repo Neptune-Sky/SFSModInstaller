@@ -86,7 +86,7 @@ namespace ModInstaller.GUI
                     noResults.gameObject.SetActive(true);
                     return;
             }
-            SearchPane.PageButtonsEnabled(true);
+            // SearchPane.PageButtonsEnabled(true);
             
             var i = 0;
             for (; i < Requests.results.Count; i++)

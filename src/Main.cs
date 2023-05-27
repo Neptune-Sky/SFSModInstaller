@@ -34,10 +34,10 @@ namespace ModInstaller
         private static Harmony patcher;
         public static Main inst;
         public static bool DisableModUpdates => true;
-        public override async void Load()
+        public override /*async*/ void Load()
         {
-            IUpdatable modToUpdate = new Main(); // Replace MyMod with the actual class implementing IUpdatable
-            await ModsUpdater.Update(modToUpdate);
+            // IUpdatable modToUpdate = new Main(); // Replace MyMod with the actual class implementing IUpdatable
+            // await ModsUpdater.Update(modToUpdate);
         }
 
         public static FolderPath modFolder;
