@@ -86,7 +86,7 @@ namespace ModInstaller.GUI
                     noResults.gameObject.SetActive(true);
                     return;
             }
-            // SearchPane.PageButtonsEnabled(true);
+            SearchPane.PageButtonsEnabled(true);
             
             var i = 0;
             for (; i < Requests.results.Count; i++)
@@ -117,7 +117,7 @@ namespace ModInstaller.GUI
                 // button.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             }
             
-            if (i >= buttons.Count - 1) return;
+            // if (i >= buttons.Count - 1) return;
 
             for (; i < buttons.Count; i++)
             {
