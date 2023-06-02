@@ -1,4 +1,3 @@
-using HarmonyLib;
 using JetBrains.Annotations;
 using ModInstaller.GUI;
 using ModLoader;
@@ -30,8 +29,6 @@ namespace ModInstaller
                 new FolderPath(ModFolder).ExtendToFile("ModInstaller.dll")
             }
         };
-
-        private static Harmony patcher;
         public static Main inst;
         public static bool DisableModUpdates => true;
         public override /*async*/ void Load()
@@ -46,8 +43,6 @@ namespace ModInstaller
         {
             inst = this;
             SceneHelper.OnHomeSceneLoaded += insertModsButton;
-            patcher = new Harmony(ModNameID);
-            patcher.PatchAll();
 
             modFolder = new FolderPath(ModFolder);
 
