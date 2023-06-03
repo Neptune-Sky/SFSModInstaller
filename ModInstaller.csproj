@@ -458,6 +458,7 @@
     <Compile Include="src\API\APIData.cs" />
     <Compile Include="src\API\APIHandling.cs" />
     <Compile Include="src\GUI\GUIHandling.cs" />
+    <Compile Include="src\GUI\IconDownloader.cs" />
     <Compile Include="src\GUI\ModInfoPane.cs" />
     <Compile Include="src\GUI\SearchPane.cs" />
     <Compile Include="src\InstallHandling.cs" />

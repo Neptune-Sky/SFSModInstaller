@@ -38,7 +38,7 @@ namespace ModInstaller.GUI
         private Label version;
         private Label tags;
         private Box iconBox;
-        private Sprite icon;
+        private SpriteRenderer iconRenderer;
 
         private Label LabelHelper(Transform parent, int width, int height, TextAlignmentOptions alignment, string text = "",
             int maxFontSize = 25)
@@ -52,7 +52,11 @@ namespace ModInstaller.GUI
         {
             box = CreateBox(window, (int)window.Size.x - 25, 140);
             var layout = box.CreateLayoutGroup(Type.Horizontal, spacing: 15);
-            iconBox = CreateBox(box, (int)(box.Size.y - 20), (int)(box.Size.y - 20));
+            iconBox = CreateBox(box, (int)(box.Size.y - 20), (int)(box.Size.y - 20), opacity: 1f);
+
+            var iconHolder = new GameObject();
+            iconHolder.transform.SetParent(iconBox.rectTransform);
+            iconRenderer = iconHolder.gameObject.AddComponent<SpriteRenderer>();
 
             var itemSizes = new Vector2Int((int)((box.Size.x - iconBox.Size.x * 2) / 2 - layout.spacing * 2), (int)iconBox.Size.y / 2);
             
@@ -69,13 +73,14 @@ namespace ModInstaller.GUI
             showInfo = CreateButton(box, (int)iconBox.Size.x, (int)iconBox.Size.y, text: "Show\nMore");
         }
 
-        public void ChangeListing(ModData modData, Action buttonOnClick)
+        public async void ChangeListing(ModData modData, Action buttonOnClick)
         {
             name.Text = modData.modName;
             author.Text = modData.modAuthor;
             version.Text = modData.modVersion;
             tags.Text = modData.modTags;
             showInfo.OnClick = buttonOnClick;
+            iconRenderer.sprite = await IconDownloader.DownloadImageAsync(modData.modIcon);
         }
 
         public void SetButtonSelected(bool selected = true)
@@ -87,6 +92,8 @@ namespace ModInstaller.GUI
         {
             box.gameObject.SetActive(active);
         }
+        
+        
     }
     internal static class ModList
     {
