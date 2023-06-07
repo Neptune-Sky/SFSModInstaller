@@ -24,7 +24,7 @@ namespace ModInstaller.GUI
 
         private static bool fieldsChanged;
         
-        private static int results = 0;
+        private static int results;
         private static int page = 1;
         private static int totalPages = 1;
         
@@ -120,7 +120,6 @@ namespace ModInstaller.GUI
             if (!regenerate) return;
             ModInfoPane.Regenerate(new ModData());
             ModList.Regenerate(tagsQuery.Text, searchQuery.Text, InstallerMenu.maxModsPerPage * (page - 1));
-            
         }
     }
 }

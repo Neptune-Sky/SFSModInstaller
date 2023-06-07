@@ -22,8 +22,6 @@ namespace ModInstaller.GUI
             var windowDimensions = new Vector2Int(1125, 1250);
             window = CreateWindow(menuHolder.transform, GetRandomID(), windowDimensions.x, windowDimensions.y,  - windowDimensions.x / 2 + 140, windowDimensions.y / 2, titleText: "Mod List");
             window.CreateLayoutGroup(Type.Vertical, TextAnchor.UpperCenter);
-            // window.gameObject.transform.Find("Back (Game)").gameObject.SetActive(false);
-            // window.gameObject.transform.Find("Back (InGame)").gameObject.SetActive(false);
 
             Box modListBox = CreateBox(window.gameObject.transform, 1100, 1175, 0, -windowDimensions.y / 2 - 25);
             ModList.Setup(modListBox);
@@ -38,9 +36,9 @@ namespace ModInstaller.GUI
         private Label version;
         private Label tags;
         private Box iconBox;
-        private SpriteRenderer iconRenderer;
+        private WebImage icon;
 
-        private Label LabelHelper(Transform parent, int width, int height, TextAlignmentOptions alignment, string text = "",
+        private static Label LabelHelper(Transform parent, int width, int height, TextAlignmentOptions alignment, string text = "",
             int maxFontSize = 25)
         {
             Label toReturn = CreateLabel(parent, width, height, text: text);
@@ -51,14 +49,16 @@ namespace ModInstaller.GUI
         public void Init(Window window)
         {
             box = CreateBox(window, (int)window.Size.x - 25, 140);
+            // ReSharper disable once SuggestVarOrType_SimpleTypes
             var layout = box.CreateLayoutGroup(Type.Horizontal, spacing: 15);
-            iconBox = CreateBox(box, (int)(box.Size.y - 20), (int)(box.Size.y - 20), opacity: 1f);
-
-            var iconHolder = new GameObject();
-            iconHolder.transform.SetParent(iconBox.rectTransform);
-            iconRenderer = iconHolder.gameObject.AddComponent<SpriteRenderer>();
-
-            var itemSizes = new Vector2Int((int)((box.Size.x - iconBox.Size.x * 2) / 2 - layout.spacing * 2), (int)iconBox.Size.y / 2);
+            
+            iconBox = CreateBox(box, (int)(box.Size.y - 20), (int)(box.Size.y - 20));
+            
+            icon = CreateWebImage(iconBox, (int)iconBox.Size.x, (int)iconBox.Size.y);
+            icon.gameObject.SetActive(false);
+            
+            // Used on labels to allow them to shrink/grow if icon box or mod entry box size changes.
+            var itemSizes = new Vector2Int((int)((box.Size.x - iconBox.Size.x * 1.666) / 2 - layout.spacing * 2), (int)iconBox.Size.y / 2);
             
             Container container1 = CreateContainer(box);
             container1.CreateLayoutGroup(Type.Vertical, spacing: 0);
@@ -70,17 +70,25 @@ namespace ModInstaller.GUI
             version = LabelHelper(container2, itemSizes.x, itemSizes.y, TextAlignmentOptions.TopRight);
             tags = LabelHelper(container2, itemSizes.x, itemSizes.y, TextAlignmentOptions.BottomRight);
 
-            showInfo = CreateButton(box, (int)iconBox.Size.x, (int)iconBox.Size.y, text: "Show\nMore");
+            showInfo = CreateButton(box, (int)(iconBox.Size.x / 1.5), (int)iconBox.Size.y, text: "+");
+            showInfo.gameObject.GetComponentInChildren<TextMeshProUGUI>().fontSizeMin = 60;
         }
 
-        public async void ChangeListing(ModData modData, Action buttonOnClick)
+        public void ChangeListing(ModData modData, Action buttonOnClick)
         {
             name.Text = modData.modName;
             author.Text = modData.modAuthor;
             version.Text = modData.modVersion;
             tags.Text = modData.modTags;
             showInfo.OnClick = buttonOnClick;
-            iconRenderer.sprite = await IconDownloader.DownloadImageAsync(modData.modIcon);
+            Debug.Log(modData.modIcon);
+            if (modData.modIcon == null)
+            {
+                icon.gameObject.SetActive(false);
+                return;
+            }
+            icon.gameObject.SetActive(true);
+            icon.ImageLink = modData.modIcon;
         }
 
         public void SetButtonSelected(bool selected = true)
@@ -111,6 +119,9 @@ namespace ModInstaller.GUI
             if (window != null) Object.Destroy(window);
 
             window = CreateWindow(box.gameObject.transform, GetRandomID(), (int)box.Size.x, (int)box.Size.y + 40, 0, (int)box.Size.y / 2 + 40);
+            
+            // Disable the visual parts of the window. These are not needed, as we are only using the window for the scroll
+            // element.
             window.gameObject.transform.Find("Back (Game)").gameObject.SetActive(false);
             window.gameObject.transform.Find("Back (InGame)").gameObject.SetActive(false);
             window.gameObject.transform.Find("Title").gameObject.SetActive(false);
@@ -150,6 +161,8 @@ namespace ModInstaller.GUI
             switch (Requests.results)
             {
                 case null:
+                    // results is set to null when an error occurs during the API request or
+                    // deserialization of the received JSON.
                     error.gameObject.SetActive(true);
                     return;
                 case { Count: 0 }:
@@ -158,7 +171,9 @@ namespace ModInstaller.GUI
             }
             SearchPane.PageButtonsEnabled(true);
             
+            // define i outside of the for to use it afterwards. 
             var i = 0;
+            
             for (; i < Requests.results.Count; i++)
             {
                 ModListEntry entry = entries[i];
@@ -182,15 +197,12 @@ namespace ModInstaller.GUI
                     entry.SetButtonSelected();
                     activeEntry = entry;
                 });
-                // button.gameObject.GetComponent<ButtonPC>().SetEnabled(false);
             }
             
-            // if (i >= buttons.Count - 1) return;
-
+            // hides any entries that weren't updated
             for (; i < entries.Count; i++)
             {
-                ModListEntry entry = entries[i];
-                entry.SetActive(false);
+                entries[i].SetActive(false);
             }
             window.gameObject.SetActive(true);
         }

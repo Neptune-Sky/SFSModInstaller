@@ -119,7 +119,7 @@ namespace ModInstaller.GUI
                 tags.Text = string.Join(", ", modTags);
             }
 
-            if (nodownload || InstallHandling.modsAwaitingInstall.Contains(modData.modID)) return;
+            if (nodownload || InstallHandling.modsAwaitingInstall.Contains(modData.modID) || modData.modName == "") return;
 
             
             installButton.gameObject.GetComponent<ButtonPC>().SetEnabled(true);

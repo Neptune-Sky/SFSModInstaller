@@ -24,10 +24,11 @@ namespace ModInstaller
             {
                 MsgDrawer.main.Log("Installing " + modData.modName + "...");
                 await InstallMod(modData.modID);
-                MsgDrawer.main.Log("Install Successful: " + modData.modName + "");
+                MsgDrawer.main.Log("Install Successful: " + modData.modName);
             }
             catch (Exception e)
             {
+                MsgDrawer.main.Log("Install Failed: " + modData.modName);
                 Debug.LogError(e);
                 return;
             }
