@@ -78,6 +78,11 @@ namespace ModInstaller
                             case "mod-zip":
                                 await DownloadAndUnzipFile(fileURL, modFolderPath);
                                 break;
+                            case "root":
+                                await DownloadFile(fileURL,
+                                    new FolderPath(modFolderPath.Replace("/Mods","") + "/" + Regex.Replace(fileName, ".dll$", ""))
+                                        .ExtendToFile(fileName));
+                                break;
                         }
                     }
                     modsAwaitingInstall.Remove(modID);
