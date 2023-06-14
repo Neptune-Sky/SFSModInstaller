@@ -6,7 +6,7 @@ Adds a new in-game menu that streamlines installing mods.
 
 # How to Use
 1. Use the `Open Mods Folder` button in the Mod Loader menu of the game.
-2. Download `ModInstaller.dll` from the latest release in the pain shown on the right.
+2. Download `ModInstaller.dll` from the latest release in the pane shown on the right.
 3. Drag and drop the DLL into the folder, then close and re-open the game.
 
 # Adding Your Own Mods
